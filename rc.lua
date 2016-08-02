@@ -59,7 +59,7 @@ function run_once(cmd)
     awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
 end
 
---awful.util.spawn_with_shell("xcompmgr &")
+awful.util.spawn_with_shell("xset s +dpms")
 --awful.util.spawn_with_shell("wmctrl -x -a conky || conky")
 
 run_once("setxkbmap -layout 'us,ru' -variant ',winkeys,winkeys' -option grp:caps_toggle -option grp_led:caps")
@@ -181,6 +181,23 @@ batterywidgettimer:connect_signal("timeout",
   end    
 )    
 battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."5 min")
+local suspend = "enabled"
+batterywidget:buttons(awful.util.table.join(
+  awful.button({ }, 1, function() --click to (un)mute
+    if suspend == "enabled" then
+        awful.util.spawn("xset s -dpms")
+        awful.util.spawn("xautolock -disable")
+        battery_tip:set_text("\nDPMS\t" .. "Disabled\nSleep\t" .."Disabled")
+        suspend = "disabled"
+    else
+        awful.util.spawn("xset s +dpms")
+        awful.util.spawn("xautolock enable")
+        battery_tip:set_text("\nDPMS\t" .. "Enabled\nSleep\t" .."Enabled")
+        suspend = "enabled"
+    end
+  end)
+))
+--battery_tip:set_timeout(10000)
 batterywidgettimer:start()
 ---- ALSA volume widget
 volume_label = wibox.widget.textbox()
@@ -668,22 +685,26 @@ local function bat_notification()
       , position   = "top_right"
     })
   end
+  if suspend == "enabled" then
   if bat_status == "Charging" and xsetState == "bat" then
     awful.util.spawn("xset s 300 300")
     xsetState = "ac"
     battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."5 min")
     if xautolockState == "enabled" then
         awful.util.spawn("xautolock -disable")
-        battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."Disabled")
+        xautolockState = "disabled"
+        battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."Disabled\n" .. xsetState .. xautolockState)
     end
   elseif bat_status == "Discharging" and xsetState == "ac" then
     awful.util.spawn("xset s 180 180")
-    battery_tip:set_text("\nDPMS\t" .. "3 min\nSleep\t" .."Disabled")
+    battery_tip:set_text("\nDPMS\t" .. "3 min\nSleep\t" .."Disabled\n" .. xsetState .. xautolockState)
     if xautolockState == "disabled" then
         awful.util.spawn("xautolock -enable")
+        xautolockState = "enabled"
         battery_tip:set_text("\nDPMS\t" .. "3 min\nSleep\t" .."5 min")
     end
     xsetState = "bat"
+  end
   end
 end
 
@@ -705,16 +726,15 @@ local function pauseSuspend()
                 end
         end
     end
+    if suspend == "enabled" then
     if i > 0 and xautolockState == "enabled" then
-        naughty.notify({text = "Disabling PM"})
         awful.util.spawn("xautolock -disable")
         awful.util.spawn("xset s -dpms")
         battery_tip:set_text("\nDPMS\t" .. "Disabled\nSleep\t" .."Disabled")
         xautolockState = "disabled"
     elseif i == 0 and xautolockState == "disabled" then
-        naughty.notify({text = "Enabling PM"})
         awful.util.spawn("xautolock -enable")
-        if xsetStatus == "ac" then
+        if xsetState == "ac" then
             awful.util.spawn("xset s 300 300")
             battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."5 min")
         else
@@ -723,7 +743,7 @@ local function pauseSuspend()
         end
         xautolockState = "enabled"
      end
-
+     end
 end
 suspendtimer = timer({timeout = 120 })
 suspendtimer:connect_signal("timeout", pauseSuspend)
