@@ -59,7 +59,7 @@ function run_once(cmd)
     awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
 end
 
-awful.util.spawn_with_shell("xcompmgr &")
+--awful.util.spawn_with_shell("xcompmgr &")
 --awful.util.spawn_with_shell("wmctrl -x -a conky || conky")
 
 run_once("setxkbmap -layout 'us,ru' -variant ',winkeys,winkeys' -option grp:caps_toggle -option grp_led:caps")
@@ -67,8 +67,10 @@ run_once("kbdd")
 run_once("conky")
 run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
 run_once("syndaemon -d -i 1")
-run_once("xfce4-power-manager")
-
+--run_once("xfce4-power-manager")
+run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
+run_once("xcompmgr &")
+run_once("xset s 180 180")
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
@@ -156,6 +158,7 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
+app_folders = { "/usr/share/applications/", "~/.local/share/applications/" }
 -- }}}
 
 -- {{{ Wibox
@@ -168,6 +171,7 @@ cal.bg_focus = theme.bg_normal
 -- Create a battery monitor widget
 batterywidget = wibox.widget.textbox()    
 batterywidget:set_text(" | Battery | ")    
+battery_tip = awful.tooltip({ objects = { batterywidget }})
 batterywidgettimer = timer({ timeout = 60 })    
 batterywidgettimer:connect_signal("timeout",    
   function()    
@@ -176,6 +180,7 @@ batterywidgettimer:connect_signal("timeout",
     fh:close()    
   end    
 )    
+battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."5 min")
 batterywidgettimer:start()
 ---- ALSA volume widget
 volume_label = wibox.widget.textbox()
@@ -201,7 +206,7 @@ mailwidgettimer:connect_signal("timeout",
     function()
        local f_sp_mail = assert(io.popen("cat $HOME/.bin/temp/mail_counter|grep denis@speran.info|awk '{print $2}'"))
        local f_pfk_mail = assert(io.popen("cat $HOME/.bin/temp/mail_counter|grep denis@pfk-rus.ru|awk '{print $2}'"))
-       local f_telegram = assert(io.popen("for i in `echo dialog_list|telegram-cli|grep unread|awk '{print $(NF-1)}'`; do res=$((res + i));done;echo $res"))
+       local f_telegram = assert(io.popen("for i in `echo dialog_list|telegram-cli|grep unread|awk '{print $(NF-1)}'`; do res=$((res + i));done; [[ -z $res ]] && echo 0 || echo $res"))
        local sp_mail = tonumber(f_sp_mail:read())
        local pfk_mail = tonumber(f_pfk_mail:read())
        local telegram = tonumber(f_telegram:read())
@@ -220,9 +225,10 @@ mailwidgettimer:connect_signal("timeout",
     end
 )
 mailwidgettimer:start()
---[[
+
 function volume(action)
-  local mixer   
+  local mixer 
+  local alsa_channel = "Master"
   if action == "+" or action == "-" then
     mixer = awful.util.pread("amixer sset " .. alsa_channel .. " 5%" .. action) --change the step to you taste
   elseif action == "toggle" then
@@ -230,6 +236,8 @@ function volume(action)
   else
     mixer = awful.util.pread("amixer get " .. alsa_channel)
   end
+end
+--[[
   local volu, mute = string.match(mixer, "([%d]+)%%.*%[([%l]*)")
   if volu == nil or (mute == "" and volu == "0") or mute == "off" then
     alsawidget:set_image(i_dir .. "audio-volume-muted.png")
@@ -453,7 +461,8 @@ globalkeys = awful.util.table.join(
     awful.key({ }, "XF86AudioLowerVolume", function() volume("-") end),
     awful.key({ }, "XF86AudioMute",        function() volume("toggle") end),
     -- Custom keybindings
-    awful.key({ modkey,         }, "d", function() awful.util.spawn("luakit drebedengi.ru")end)
+    awful.key({ modkey,         }, "d", function() awful.util.spawn("luakit drebedengi.ru")end),
+    awful.key({ }, "Print", function () awful.util.spawn("xfce4-screenshooter") end)
     )
 
 clientkeys = awful.util.table.join(
@@ -633,9 +642,10 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 
 --alsawidget:connect_signal("mouse::enter", function() volume("update") end)
 -- }}}
-
--- battery warning
--- created by bpdp
+-- {{ CUSTOM daemons
+local xsetState = "bat"
+local xautolockState = "enabled"
+-- Battery warning
 
 local function trim(s)
   return s:find'^%s*$' and '' or s:match'^%s*(.*%S)'
@@ -658,6 +668,23 @@ local function bat_notification()
       , position   = "top_right"
     })
   end
+  if bat_status == "Charging" and xsetState == "bat" then
+    awful.util.spawn("xset s 300 300")
+    xsetState = "ac"
+    battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."5 min")
+    if xautolockState == "enabled" then
+        awful.util.spawn("xautolock -disable")
+        battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."Disabled")
+    end
+  elseif bat_status == "Discharging" and xsetState == "ac" then
+    awful.util.spawn("xset s 180 180")
+    battery_tip:set_text("\nDPMS\t" .. "3 min\nSleep\t" .."Disabled")
+    if xautolockState == "disabled" then
+        awful.util.spawn("xautolock -enable")
+        battery_tip:set_text("\nDPMS\t" .. "3 min\nSleep\t" .."5 min")
+    end
+    xsetState = "bat"
+  end
 end
 
 battimer = timer({timeout = 120})
@@ -665,3 +692,40 @@ battimer:connect_signal("timeout", bat_notification)
 battimer:start()
 
 -- end here for battery warning
+
+-- suspend on idle
+local function pauseSuspend()
+    local apps = {"Vlc", "Deadbeef"}
+    local clients = client.get()
+    local i = 0
+    for _, appsValue in pairs(apps) do
+        for _, clientsValue in pairs(clients) do
+                if clientsValue.class == appsValue then
+                    i = i + 1
+                end
+        end
+    end
+    if i > 0 and xautolockState == "enabled" then
+        naughty.notify({text = "Disabling PM"})
+        awful.util.spawn("xautolock -disable")
+        awful.util.spawn("xset s -dpms")
+        battery_tip:set_text("\nDPMS\t" .. "Disabled\nSleep\t" .."Disabled")
+        xautolockState = "disabled"
+    elseif i == 0 and xautolockState == "disabled" then
+        naughty.notify({text = "Enabling PM"})
+        awful.util.spawn("xautolock -enable")
+        if xsetStatus == "ac" then
+            awful.util.spawn("xset s 300 300")
+            battery_tip:set_text("\nDPMS\t" .. "5 min\nSleep\t" .."5 min")
+        else
+            awful.util.spawn("xset s 180 180")
+            battery_tip:set_text("\nDPMS\t" .. "3 min\nSleep\t" .."5 min")
+        end
+        xautolockState = "enabled"
+     end
+
+end
+suspendtimer = timer({timeout = 120 })
+suspendtimer:connect_signal("timeout", pauseSuspend)
+suspendtimer:start()
+-- end for suspend on idle
