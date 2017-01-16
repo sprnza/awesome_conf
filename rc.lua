@@ -175,18 +175,18 @@ function run_once(cmd)
     if firstspace then
         findme = cmd:sub(0, firstspace-1)
     end
-    awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
+    awful.spawn.with_shell("pgrep -u $USER -x " .. findme .. " > /dev/null || (" .. cmd .. ")")
 end
 
 --awful.util.spawn_with_shell("xset s +dpms")
 --awful.util.spawn_with_shell("wmctrl -x -a conky || conky")
 
---run_once("setxkbmap -layout 'us,ru' -variant ',winkeys,winkeys' -option grp:caps_toggle -option grp_led:caps")
---run_once("kbdd")
+run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
+run_once("kbdd")
 --run_once("conky")
---run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
+run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
 --run_once("syndaemon -d -i 1")
---run_once("xfce4-power-manager")
+run_once("xfce4-power-manager")
 --run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
 --run_once("xcompmgr &")
 --run_once("xset s 180 180")
@@ -246,9 +246,26 @@ myawesomemenu = {
    { "restart", awesome.restart },
    { "quit", function() awesome.quit() end}
 }
+powerMenu = {
+    { "Logout", awesome.quit },
+    { "Suspend", "systemctl suspend" },
+    { "Hibernate", "systemctl hibernate" },
+    { "Reboot", "systemctl reboot" },
+    { "Shutdown", "systemctl poweroff" }
+}
+internetMenu = {
+    { "Firefox", "firefox" },
+    { "Luakit", "luakit" },
+    { "Telegram", "telegram-desktop" },
+    { "Geary", "geary"}
+}
 
-mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal }
+
+mymainmenu = awful.menu({ items = { { "Internet", internetMenu },
+                                    { "Files", thunar },
+                                    { "awesome", myawesomemenu, beautiful.awesome_icon },
+                                    { "open terminal", terminal },
+                                    { "Power", powerMenu },
                                   }
                         })
 
@@ -257,14 +274,50 @@ mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
 
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
+--app_folders = { "/usr/share/applications/", "~/.local/share/applications/" }
+
 -- }}}
 
 -- Keyboard map indicator and switcher
-mykeyboardlayout = awful.widget.keyboardlayout()
+--local mykeyboardlayout = wibox.widget.textbox()
+mykeyboardlayout = awful.widget.keyboardlayout:new()
+mykeyboardlayout.widget.align = "center"
+
+--mykeyboardlayout:set_text(kbw)
+
+-- {{{ Custom widgets
+local mailwidget_label = wibox.widget.textbox()
+local mailwidget = wibox.container.background()
+mailwidget_label:set_text("@")
+mailwidget_label:set_align("center")
+mailwidget:set_widget(mailwidget_label)
+mailwidget_tip = awful.tooltip({ objects = { mailwidget }})
+mailwidgettimer = gears.timer({ timeout = 60 })
+sp_mail = 0
+pfk_mail = 0
+telegram = 0
+mailwidgettimer:connect_signal("timeout",
+    function()
+       if ( sp_mail > 0 or pfk_mail > 0) then
+        mailwidget:set_bg("#FF0000")
+        mailwidget_label:set_text(" " .. sp_mail+pfk_mail .. " ")
+       else
+        mailwidget:set_bg(theme.bg_normal)
+        mailwidget_label:set_text("@")
+       end
+       if ( telegram > 0 ) then
+        mailwidget:set_bg("#009DFF")
+        mailwidget_label:set_text(" T ")
+       end
+       mailwidget_tip:set_text("MAIL\ndenis@speran.info\t" .. sp_mail .. "\n" .. "denis@pfk-rus.ru\t" .. pfk_mail .. "\nTELEGRAM\nDenis\t\t\t" .. telegram)
+    end
+)
+mailwidgettimer:start()
 
 -- {{{ Wibar
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock("%H:%M")
+mytextclock:set_align("center")
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
@@ -357,9 +410,10 @@ awful.screen.connect_for_each_screen(function(s)
     local mid_layout =  wibox.layout.fixed.vertical()
     mid_layout:add(s.mytasklist)
     local bot_layout = wibox.layout.fixed.vertical()
+    bot_layout:add(mailwidget)
     bot_layout:add(mykeyboardlayout)
-    bot_layout:add(mytextclock)
     bot_layout:add(s.mylayoutbox)
+    bot_layout:add(mytextclock)
     
     local layout = wibox.layout.align.vertical()
     layout:set_top(top_layout)
@@ -479,7 +533,7 @@ globalkeys = awful.util.table.join(
     -- Prompt
 --    awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
 --              {description = "run prompt", group = "launcher"}),
-    awful.key({ modkey },            "r",     function () awful.util.spawn("gmrun") end), 
+    awful.key({ modkey },            "r",     function () awful.spawn("gmrun") end), 
     awful.key({ modkey }, "x",
               function ()
                   awful.prompt.run {
