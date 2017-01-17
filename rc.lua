@@ -791,10 +791,18 @@ awful.rules.rules = {
      { rule = { class = "Firefox" },
        properties = { screen = 1, tag = "➋" } },
      { rule_any = { class = { "Geary", "TelegramDesktop" } },
-       properties = { screen = 1, tag = "➍" } },
+       properties = { screen = 1, tag = "➍", callback =  function()
+                        if not awesome.startup then    
+                            local screen = awful.screen.focused()
+                            local tag = screen.tags[4]
+                            if tag then
+                                tag:view_only()
+                            end
+                        end
+                    end
+       } },
 }
 -- }}}
-
 -- {{{ Signals
 -- Signal function to execute when a new client appears.
 client.connect_signal("manage", function (c)
