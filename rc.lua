@@ -13,12 +13,12 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 
 local common = require("awful.widget.common")
 local lain = require("lain")
-local vicious = require("vicious")
 
 
 -- {{{ Notifications position and border width
---naughty.config.defaults.position = "bottom.left"
---naughty.config.default.border_width = 2
+naughty.config.defaults.position = "bottom_left"
+naughty.config.icon_dirs = {"/usr/share/icons/Surfn/48/notifications/"}
+naughty.config.icon_formats = {"png", "svg"}
 -- }}}
 
 
@@ -185,7 +185,7 @@ run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps
 run_once("kbdd")
 --run_once("conky")
 run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
---run_once("syndaemon -d -i 1")
+run_once("syndaemon -d -k -i 1")
 run_once("xfce4-power-manager")
 --run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
 --run_once("xcompmgr &")
@@ -262,7 +262,7 @@ internetMenu = {
 
 
 mymainmenu = awful.menu({ items = { { "Internet", internetMenu },
-                                    { "Files", thunar },
+                                    { "Files", "thunar" },
                                     { "awesome", myawesomemenu, beautiful.awesome_icon },
                                     { "open terminal", terminal },
                                     { "Power", powerMenu },
@@ -288,31 +288,103 @@ mykeyboardlayout.widget.align = "center"
 -- {{{ Custom widgets
 local mailwidget_label = wibox.widget.textbox()
 local mailwidget = wibox.container.background()
+mailwidget_buttons = awful.util.table.join(
+    awful.button({ }, 1, function () awful.spawn("geary") end)
+    )
+mailwidget:buttons(mailwidget_buttons)
 mailwidget_label:set_text("@")
 mailwidget_label:set_align("center")
+
 mailwidget:set_widget(mailwidget_label)
 mailwidget_tip = awful.tooltip({ objects = { mailwidget }})
 mailwidgettimer = gears.timer({ timeout = 60 })
-sp_mail = 0
-pfk_mail = 0
+pr_mail = 0
+wrk_mail = 0
 telegram = 0
+mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
 mailwidgettimer:connect_signal("timeout",
     function()
-       if ( sp_mail > 0 or pfk_mail > 0) then
+       if ( pr_mail > 0 or wrk_mail > 0) then
         mailwidget:set_bg("#FF0000")
-        mailwidget_label:set_text(" " .. sp_mail+pfk_mail .. " ")
+        mailwidget_label:set_text(pr_mail+wrk_mail)
+        mailwidget_buttons = awful.util.table.join(
+            awful.button({ }, 1, function () awful.spawn("geary") end)
+            )
+        mailwidget:buttons(mailwidget_buttons)
        else
         mailwidget:set_bg(theme.bg_normal)
         mailwidget_label:set_text("@")
+        mailwidget_buttons = awful.util.table.join(
+            awful.button({ }, 1, function () awful.spawn("geary") end)
+            )
+        mailwidget:buttons(mailwidget_buttons)
        end
        if ( telegram > 0 ) then
         mailwidget:set_bg("#009DFF")
-        mailwidget_label:set_text(" T ")
+        mailwidget_label:set_text(telegram)
+        mailwidget_buttons = awful.util.table.join(
+            awful.button({ }, 1, function () awful.spawn("telegram-desktop") end)
+            )
+        mailwidget:buttons(mailwidget_buttons)
        end
-       mailwidget_tip:set_text("MAIL\ndenis@speran.info\t" .. sp_mail .. "\n" .. "denis@pfk-rus.ru\t" .. pfk_mail .. "\nTELEGRAM\nDenis\t\t\t" .. telegram)
+       mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
     end
 )
 mailwidgettimer:start()
+
+-- Volume widget stuff
+
+function volume(action)
+  local mixer
+  local alsa_channel = my_volume.channel
+  if action == "+" or action == "-" then
+    mixer = io.popen("amixer -q sset " .. alsa_channel .. " 3%" .. action) --change the step to you taste
+  elseif action == "toggle" then
+    mixer = io.popen("amixer -q sset " .. alsa_channel .. " " .. action)
+  else
+    mixer = io.popen("amixer -q get " .. alsa_channel)
+  end
+end
+volnotify = {}
+volnotify.id = nil
+function volnotify:notify(vol)
+    if vol == "M" then
+        txt = 'Volume muted'
+        icn = "notification-audio-volume-muted"
+    else
+        txt = 'Volume: ' .. vol .. '%'
+        if tonumber(vol) == 0 then
+            icn = "notification-audio-volume-off"
+        elseif (tonumber(vol) <= 33) then
+            icn = "notification-audio-volume-low"
+        elseif (tonumber(vol) <= 66) then
+            icn = "notification-audio-volume-medium"
+        elseif (tonumber(vol) <= 100) then
+            icn = "notification-audio-volume-high"
+        end
+    end
+    self.id = naughty.notify({ text = txt, replaces_id = self.id, icon = icn}).id
+end
+
+
+my_volume=lain.widgets.alsa({timeout=1,
+settings = function()
+        if volume_now.status == "off" then
+            volume_now.level = "M"
+        end
+
+        widget:set_align("center")
+        if volume_now.level == "M" then
+            widget:set_markup(markup(beautiful.fg_urgent,"♫" .. volume_now.level))
+            volnotify:notify(volume_now.level)
+        else
+            widget:set_markup(markup(beautiful.text_light,"♫" .. volume_now.level .. "%"))
+            volnotify:notify(volume_now.level)
+        end
+    end
+})
+
+-- }}}
 
 -- {{{ Wibar
 -- Create a textclock widget
@@ -411,6 +483,7 @@ awful.screen.connect_for_each_screen(function(s)
     mid_layout:add(s.mytasklist)
     local bot_layout = wibox.layout.fixed.vertical()
     bot_layout:add(mailwidget)
+    bot_layout:add(my_volume)
     bot_layout:add(mykeyboardlayout)
     bot_layout:add(s.mylayoutbox)
     bot_layout:add(mytextclock)
@@ -546,7 +619,17 @@ globalkeys = awful.util.table.join(
               {description = "lua execute prompt", group = "awesome"}),
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
-              {description = "show the menubar", group = "launcher"})
+              {description = "show the menubar", group = "launcher"}),
+    -- ALSA volume
+    awful.key({ }, "XF86AudioRaiseVolume", function() volume("+") 
+        my_volume.update()
+    end),
+    awful.key({ }, "XF86AudioLowerVolume", function() volume("-")
+        my_volume.update()
+    end),
+    awful.key({ }, "XF86AudioMute",        function() volume("toggle")
+        my_volume.update()
+    end)
 )
 
 clientkeys = awful.util.table.join(
@@ -689,8 +772,10 @@ awful.rules.rules = {
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { screen = 1, tag = "2" } },
+     { rule = { class = "Firefox" },
+       properties = { screen = 1, tag = "➋" } },
+     { rule_any = { class = { "Geary", "TelegramDesktop" } },
+       properties = { screen = 1, tag = "➍" } },
 }
 -- }}}
 
@@ -725,7 +810,7 @@ client.connect_signal("request::titlebars", function(c)
         end)
     )
 
-    awful.titlebar(c,{size=2, bg_normal=beautiful.border_normal, bg_focus=beautiful.fg_focus}) : setup {
+    awful.titlebar(c,{size=0, bg_normal=beautiful.border_normal, bg_focus=beautiful.fg_focus}) : setup {
         { -- Left
 --            awful.titlebar.widget.iconwidget(c),
             buttons = buttons,

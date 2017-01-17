@@ -20,18 +20,19 @@ theme.text_light                    = "#EEEEEE"
 theme.useless_gap                   = "0"
 theme.fg_focus                      = theme.highlight_dark
 theme.bg_normal                     = theme.color_light
-theme.fg_urgent                     = "#CC9393"
+theme.fg_urgent                     = "#ff0000"
 theme.bg_urgent                     = "#2A1F1E"
-theme.border_width                  = "1"
+theme.border_width                  = "2"
 theme.border_normal                 = theme.color_dark
-theme.border_focus                  = theme.color_dark
+theme.border_focus                  = theme.highlight_light
 theme.taglist_bg_focus              = theme.color_light
 theme.taglist_fg_normal             = theme.text_light
 theme.taglist_fg_focus              = theme.text_light
 theme.tasklist_bg_normal            = theme.color_light
 theme.tasklist_bg_focus             = theme.highlight_dark
-theme.tooltip_bg_color              = theme.color_light
-theme.tooltip_fg_color              = theme.text_light
+theme.tooltip_bg                    = theme.color_light
+theme.tooltip_fg                    = theme.text_light
+theme.tooltip_border_width          = "1"
 theme.bg_systray                    = theme.color_light
 
 -- icon used when a client has no default
