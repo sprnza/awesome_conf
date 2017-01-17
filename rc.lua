@@ -338,12 +338,11 @@ function volume(action)
   local mixer
   local alsa_channel = my_volume.channel
   if action == "+" or action == "-" then
-    mixer = io.popen("amixer -q sset " .. alsa_channel .. " 3%" .. action) --change the step to you taste
+      act = "3%" .. action
   elseif action == "toggle" then
-    mixer = io.popen("amixer -q sset " .. alsa_channel .. " " .. action)
-  else
-    mixer = io.popen("amixer -q get " .. alsa_channel)
+      act = action
   end
+  mixer = io.popen("amixer -q sset " .. alsa_channel .. " " .. act)
 end
 volnotify = {}
 volnotify.id = nil
@@ -366,11 +365,12 @@ function volnotify:notify(vol)
     self.id = naughty.notify({ text = txt, replaces_id = self.id, icon = icn}).id
 end
 
-
+vol_state = nil
 my_volume=lain.widgets.alsa({timeout=1,
 settings = function()
         if volume_now.status == "off" then
             volume_now.level = "M"
+            vol_state = volume_now.status
         end
 
         widget:set_align("center")
@@ -495,21 +495,6 @@ awful.screen.connect_for_each_screen(function(s)
 
     s.mywibox:set_widget(layout)
 
-    --s.mywibox:setup {
-    --    layout = wibox.layout.align.vertical,
-    --   { -- Top widgets
-    --        layout = wibox.layout.fixed.vertical(),
-    --        s.mytaglist,
-    --    },
-    --    s.mytasklist, -- Middle widget
-    --    { -- Bottom widgets
-    --        layout = wibox.layout.fixed.vertical(),
-    --        mykeyboardlayout,
-    --        wibox.widget.systray(),
-    --        mytextclock,
-    --        s.mylayoutbox,
-    --    },
-    --}
 end)
 -- }}}
 
@@ -621,7 +606,13 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"}),
     -- ALSA volume
-    awful.key({ }, "XF86AudioRaiseVolume", function() volume("+") 
+    awful.key({ }, "XF86AudioRaiseVolume", function() 
+        if vol_state == "off" then
+            volume("toggle")
+            my_volume.update()
+            vol_state = "on"
+        end
+        volume("+") 
         my_volume.update()
     end),
     awful.key({ }, "XF86AudioLowerVolume", function() volume("-")
