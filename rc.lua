@@ -186,7 +186,7 @@ run_once("kbdd")
 --run_once("conky")
 run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
 run_once("syndaemon -d -k -i 1")
-run_once("xfce4-power-manager")
+--run_once("xfce4-power-manager")
 --run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
 --run_once("xcompmgr &")
 --run_once("xset s 180 180")
@@ -234,6 +234,24 @@ local function client_menu_toggle_fn()
             instance = awful.menu.clients({ theme = { width = 250 } })
         end
     end
+end
+function b_notify()
+        brt = io.popen("xbacklight")
+        brt = brt:read("*a")
+        brt = math.floor(tonumber(brt)/5+0.5)*5
+        local icon = nil
+        if brt == 10 then
+            icon = "notification-display-brightness-off"
+        elseif brt <= 35 then
+            icon = "notification-display-brightness-low"
+        elseif brt <= 60 then
+            icon = "notification-display-brightness-medium"
+        elseif brt <= 85 then
+            icon = "notification-display-brightness-high"
+        else
+            icon = "notification-display-brightness-full"
+        end
+        nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id 
 end
 -- }}}
 
@@ -620,7 +638,10 @@ globalkeys = awful.util.table.join(
     end),
     awful.key({ }, "XF86AudioMute",        function() volume("toggle")
         my_volume.update()
-    end)
+    end),
+    -- Brightness buttons
+    awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
+    awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end)
 )
 
 clientkeys = awful.util.table.join(
@@ -746,7 +767,8 @@ awful.rules.rules = {
           "Wpa_gui",
           "pinentry",
           "veromix",
-          "xtightvncviewer"},
+          "xtightvncviewer",
+          "SpeedCrunch"},
 
         name = {
           "Event Tester",  -- xev.
