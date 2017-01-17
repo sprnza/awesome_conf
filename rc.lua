@@ -365,22 +365,25 @@ end
 volnotify = {}
 volnotify.id = nil
 function volnotify:notify(vol)
-    if vol == "M" then
-        txt = 'Volume muted'
-        icn = "notification-audio-volume-muted"
-    else
-        txt = 'Volume: ' .. vol .. '%'
-        if tonumber(vol) == 0 then
-            icn = "notification-audio-volume-off"
-        elseif (tonumber(vol) <= 33) then
-            icn = "notification-audio-volume-low"
-        elseif (tonumber(vol) <= 66) then
-            icn = "notification-audio-volume-medium"
-        elseif (tonumber(vol) <= 100) then
-            icn = "notification-audio-volume-high"
+    if not awesome.startup then
+        local icn = nil
+        if vol == "M" then
+            txt = 'Volume muted'
+            icn = "notification-audio-volume-muted"
+        else
+            txt = 'Volume: ' .. vol .. '%'
+            if tonumber(vol) == 0 then
+                icn = "notification-audio-volume-off"
+            elseif (tonumber(vol) <= 33) then
+                icn = "notification-audio-volume-low"
+            elseif (tonumber(vol) <= 66) then
+                icn = "notification-audio-volume-medium"
+            elseif (tonumber(vol) <= 100) then
+                icn = "notification-audio-volume-high"
+            end
         end
+        self.id = naughty.notify({ text = txt, replaces_id = self.id, icon = icn}).id
     end
-    self.id = naughty.notify({ text = txt, replaces_id = self.id, icon = icn}).id
 end
 
 vol_state = nil
