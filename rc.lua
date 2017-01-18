@@ -404,6 +404,11 @@ settings = function()
         end
     end
 })
+my_volume:buttons(awful.util.table.join(
+    awful.button({ }, 1, function () volume("toggle") end),
+    awful.button({ }, 4, function () volume("+") end),
+    awful.button({ }, 5, function () volume("-") end)
+    ))
 
 -- }}}
 
