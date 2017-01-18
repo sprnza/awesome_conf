@@ -1,6 +1,3 @@
-local theme_assets = require("beautiful.theme_assets")
-local xresources = require("beautiful.xresources")
-local dpi = xresources.apply_dpi
 theme                               = {}
 
 theme.wallpaper                     = "~/.background.png"
@@ -21,7 +18,8 @@ theme.useless_gap                   = "0"
 theme.fg_focus                      = theme.highlight_dark
 theme.bg_normal                     = theme.color_light
 theme.fg_urgent                     = "#ff0000"
-theme.bg_urgent                     = "#2A1F1E"
+--theme.bg_urgent                     = "#2A1F1E"
+theme.bg_urgent                     = "#800000"
 theme.border_width                  = "2"
 theme.border_normal                 = theme.color_dark
 theme.border_focus                  = theme.highlight_light
@@ -53,31 +51,6 @@ theme.layout_max                    = theme.icon_dir .. "/maxw.png"
 theme.layout_fullscreen             = theme.icon_dir .. "/fullscreenw.png"
 theme.layout_magnifier              = theme.icon_dir .. "/magnifierw.png"
 theme.layout_floating               = theme.icon_dir .. "/floatingw.png"
-
--- titlebar images
-theme.tb_button                    = os.getenv("HOME") .. "/.config/awesome/themes/tb_button.png"
-theme.tb_color                     = os.getenv("HOME") .. "/.config/awesome/themes/tb_color.png"
-theme.titlebar_close_button_normal = theme.tb_color
-theme.titlebar_close_button_focus  = theme.tb_button
-theme.titlebar_maximized_button_normal_inactive = theme.tb_color
-theme.titlebar_maximized_button_focus_inactive = theme.tb_button
-theme.titlebar_maximized_button_normal_active = theme.tb_color
-theme.titlebar_maximized_button_focus_active = theme.tb_button
-theme.titlebar_minimize_button_normal_inactive = theme.tb_color
-theme.titlebar_minimize_button_focus_inactive = theme.tb_button
-theme.titlebar_minimize_button_normal_active = theme.tb_color
-theme.titlebar_minimize_button_focus_active = theme.tb_button
-
-theme.taglist_squares_sel           = "light"
-theme.taglist_squares_unsel         = "light"
-
--- lain related
---theme.lain_icons                    = os.getenv("HOME") .. "/.config/awesome/lain/icons/layout/default/"
-theme.lain_icons                    = "/usr/share/awesome/lib/lain/icons/layout/default/"
-theme.layout_termfair               = theme.lain_icons .. "termfairw.png"
-theme.layout_cascade                = theme.lain_icons .. "cascadew.png"
-theme.layout_cascadetile            = theme.lain_icons .. "cascadetilew.png"
-theme.layout_centerwork             = theme.lain_icons .. "centerworkw.png"
 
 return theme
 

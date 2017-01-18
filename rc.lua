@@ -305,46 +305,57 @@ mykeyboardlayout.widget.align = "center"
 --mykeyboardlayout:set_text(kbw)
 
 -- {{{ Custom widgets
-local mailwidget_label = wibox.widget.textbox()
-local mailwidget = wibox.container.background()
+mailwidget = wibox.container.margin()
+mailwidget.top = "3"
+
 mailwidget_buttons = awful.util.table.join(
     awful.button({ }, 1, function () awful.spawn("geary") end)
     )
-mailwidget:buttons(mailwidget_buttons)
-mailwidget_label:set_text("@")
-mailwidget_label:set_align("center")
-
-mailwidget:set_widget(mailwidget_label)
+mailwidget:setup {
+    {
+        {
+            id = "text",
+            text = "@",
+            align = "center",
+            widget = wibox.widget.textbox
+        },
+        id = "bgd",
+        buttons = mailwidget_buttons,
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.fixed.vertical
+}
 mailwidget_tip = awful.tooltip({ objects = { mailwidget }})
 mailwidgettimer = gears.timer({ timeout = 60 })
 pr_mail = 0
 wrk_mail = 0
 telegram = 0
-mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+mailwidget_tip:set_text("MAIL\nPrivate\t\t" .. pr_mail .. "\n" .. "Work\t\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t\t" .. telegram)
 mailwidgettimer:connect_signal("timeout",
     function()
        if ( pr_mail > 0 or wrk_mail > 0) then
-        mailwidget:set_bg("#FF0000")
-        mailwidget_label:set_text(pr_mail+wrk_mail)
+        mailwidget.root.bgd:set_bg(theme.bg_urgent)
+        mailwidget.root.bgd.text:set_text(pr_mail+wrk_mail)
         mailwidget_buttons = awful.util.table.join(
             awful.button({ }, 1, function () awful.spawn("geary") end)
             )
-        mailwidget:buttons(mailwidget_buttons)
+        mailwidget.root.bgd:buttons(mailwidget_buttons)
        else
-        mailwidget:set_bg(theme.bg_normal)
-        mailwidget_label:set_text("@")
+        mailwidget.root.bgd:set_bg(theme.bg_normal)
+        mailwidget.root.bgd.text:set_text("@")
         mailwidget_buttons = awful.util.table.join(
             awful.button({ }, 1, function () awful.spawn("geary") end)
             )
-        mailwidget:buttons(mailwidget_buttons)
+        mailwidget.root.bgd:buttons(mailwidget_buttons)
        end
        if ( telegram > 0 ) then
-        mailwidget:set_bg("#009DFF")
-        mailwidget_label:set_text(telegram)
+        mailwidget.root.bgd:set_bg("#009DFF")
+        mailwidget.root.bgd.text:set_text(telegram)
         mailwidget_buttons = awful.util.table.join(
             awful.button({ }, 1, function () awful.spawn("telegram-desktop") end)
             )
-        mailwidget:buttons(mailwidget_buttons)
+        mailwidget.root.bgd:buttons(mailwidget_buttons)
        end
        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
     end
@@ -388,7 +399,11 @@ function volnotify:notify(vol)
 end
 
 vol_state = nil
-my_volume=lain.widgets.alsa({timeout=1,
+my_volume = wibox.container.margin()
+my_volume.top = "3"
+
+my_volume:setup {
+    widget = lain.widgets.alsa({timeout=1,
 settings = function()
         if volume_now.status == "off" then
             volume_now.level = "M"
@@ -405,12 +420,23 @@ settings = function()
         end
     end
 })
+}
 my_volume:buttons(awful.util.table.join(
     awful.button({ }, 1, function () volume("toggle") end),
     awful.button({ }, 4, function () volume("+") end),
     awful.button({ }, 5, function () volume("-") end)
     ))
+-- Battery widget stuff
 
+my_bat = wibox.container.margin()
+my_bat.top = "3"
+my_bat:setup {
+    widget = lain.widgets.bat({settings=function()
+        widget:set_text(bat_now.perc .. "%")
+        widget:set_align("center")
+    end
+})
+}
 -- }}}
 
 -- {{{ Wibar
@@ -511,6 +537,7 @@ awful.screen.connect_for_each_screen(function(s)
     mid_layout:add(s.mytasklist)
     local bot_layout = wibox.layout.fixed.vertical()
     bot_layout:add(mailwidget)
+    bot_layout:add(my_bat)
     bot_layout:add(my_volume)
     bot_layout:add(mykeyboardlayout)
     bot_layout:add(s.mylayoutbox)
@@ -791,7 +818,7 @@ awful.rules.rules = {
 
     -- Add titlebars to normal clients and dialogs
     { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = true }
+      }, properties = { titlebars_enabled = false }
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
@@ -841,17 +868,18 @@ client.connect_signal("request::titlebars", function(c)
         end)
     )
 
-    awful.titlebar(c,{size=0, bg_normal=beautiful.border_normal, bg_focus=beautiful.fg_focus}) : setup {
+    awful.titlebar(c) : setup {
+
         { -- Left
---            awful.titlebar.widget.iconwidget(c),
+            awful.titlebar.widget.iconwidget(c),
             buttons = buttons,
             layout  = wibox.layout.fixed.horizontal
         },
         { -- Middle
---            { -- Title
----               align  = "center",
---                widget = awful.titlebar.widget.titlewidget(c)
---            },
+            { -- Title
+               align  = "center",
+                widget = awful.titlebar.widget.titlewidget(c)
+            },
             buttons = buttons,
             layout  = wibox.layout.flex.horizontal
         },
@@ -863,6 +891,7 @@ client.connect_signal("request::titlebars", function(c)
         },
         layout = wibox.layout.align.horizontal
     }
+  
 end)
 
 -- Enable sloppy focus, so that focus follows mouse.
@@ -875,24 +904,4 @@ end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
--- }}}
---
--- {{{ Arrange signal handler
-for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
-        local clients = awful.client.visible(s)
-        local layout  = awful.layout.getname(awful.layout.get(s))
-
-        if #clients > 0 then -- Fine grained borders and floaters control
-            for _, c in pairs(clients) do -- Floaters always have borders
-				if (c.maximized_horizontal == true and c.maximized_vertical == true) or layout == "max" then
-					c.border_width = 0
-					awful.titlebar.hide(c)
-				else
-					c.border_width = beautiful.border_width
-					awful.titlebar.show(c)
-				end
-            end
-        end
-      end)
-end
 -- }}}
