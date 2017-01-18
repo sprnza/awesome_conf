@@ -19,6 +19,7 @@ local lain = require("lain")
 naughty.config.defaults.position = "bottom_left"
 naughty.config.icon_dirs = {"/usr/share/icons/Surfn/48/notifications/"}
 naughty.config.icon_formats = {"png", "svg"}
+naughty.config.defaults.font = beautiful.font
 -- }}}
 
 
@@ -416,6 +417,7 @@ my_volume:buttons(awful.util.table.join(
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock("%H:%M")
 mytextclock:set_align("center")
+cal = lain.widgets.calendar.attach(mytextclock, {position = "bottom_left"})
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
@@ -500,7 +502,7 @@ awful.screen.connect_for_each_screen(function(s)
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons, nil, verticaltask, wibox.layout.fixed.vertical())
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "left", screen = s, width = 34})
+    s.mywibox = awful.wibar({ position = "left", screen = s, width = 40})
 
     -- Add widgets to the wibox
     local top_layout = wibox.layout.fixed.vertical()
