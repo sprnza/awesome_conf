@@ -366,7 +366,7 @@ mailwidgettimer:start()
 
 function volume(action)
   local mixer
-  local alsa_channel = my_volume.channel
+  local alsa_channel = my_volume.vlm.channel
   if action == "+" or action == "-" then
       act = "3%" .. action
   elseif action == "toggle" then
@@ -403,6 +403,7 @@ my_volume = wibox.container.margin()
 my_volume.top = "3"
 
 my_volume:setup {
+    id = "vlm",
     widget = lain.widgets.alsa({timeout=1,
 settings = function()
         if volume_now.status == "off" then
@@ -432,7 +433,7 @@ my_bat = wibox.container.margin()
 my_bat.top = "3"
 my_bat:setup {
     widget = lain.widgets.bat({settings=function()
-        widget:set_text(bat_now.perc .. "%")
+        widget:set_text("⚕" .. bat_now.perc .. "%")
         widget:set_align("center")
     end
 })
@@ -664,17 +665,17 @@ globalkeys = awful.util.table.join(
     awful.key({ }, "XF86AudioRaiseVolume", function() 
         if vol_state == "off" then
             volume("toggle")
-            my_volume.update()
+            my_volume.vlm.update()
             vol_state = "on"
         end
         volume("+") 
-        my_volume.update()
+        my_volume.vlm.update()
     end),
     awful.key({ }, "XF86AudioLowerVolume", function() volume("-")
-        my_volume.update()
+        my_volume.vlm.update()
     end),
     awful.key({ }, "XF86AudioMute",        function() volume("toggle")
-        my_volume.update()
+        my_volume.vlm.update()
     end),
     -- Brightness buttons
     awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
