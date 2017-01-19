@@ -537,7 +537,12 @@ awful.screen.connect_for_each_screen(function(s)
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons, nil, verticaltask, wibox.layout.fixed.vertical())
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "left", screen = s, width = 40})
+    if hostname == "arch" then
+	    wdth = "44"
+    else
+	    wdth = "40"
+    end
+    s.mywibox = awful.wibar({ position = "left", screen = s, width = wdth})
 
     -- Add widgets to the wibox
     local top_layout = wibox.layout.fixed.vertical()
