@@ -169,6 +169,9 @@ terminal = "xfce4-terminal"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -x " .. editor
 
+-- Custom variables
+hostname = io.popen("uname -n"):read()
+
 -- {{ Autostart
 function run_once(cmd)
     findme = cmd
@@ -431,6 +434,7 @@ my_volume:buttons(awful.util.table.join(
 
 my_bat = wibox.container.margin()
 my_bat.top = "3"
+my_bat.visible = false
 my_bat:setup {
     widget = lain.widgets.bat({settings=function()
         widget:set_text("⚕" .. bat_now.perc .. "%")
@@ -438,6 +442,10 @@ my_bat:setup {
     end
 })
 }
+if hostname ~= "arch" then
+	my_bat.visible = true
+end
+
 -- }}}
 
 -- {{{ Wibar
