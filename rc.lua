@@ -446,6 +446,18 @@ if hostname ~= "arch" then
 	my_bat.visible = true
 end
 
+-- Systray widget
+systray = wibox.container.margin()
+systray:setup {
+	id = "sstr",
+	widget = wibox.widget.systray()
+}
+systray.sstr:set_horizontal(false)
+if hostname == "arch" then
+	systray.left = 11
+	systray.right = 11
+end
+--systray.
 -- }}}
 
 -- {{{ Wibar
@@ -536,6 +548,7 @@ awful.screen.connect_for_each_screen(function(s)
     -- Create a tasklist widget
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons, nil, verticaltask, wibox.layout.fixed.vertical())
 
+
     -- Create the wibox
     if hostname == "arch" then
 	    wdth = "44"
@@ -550,6 +563,8 @@ awful.screen.connect_for_each_screen(function(s)
     local mid_layout =  wibox.layout.fixed.vertical()
     mid_layout:add(s.mytasklist)
     local bot_layout = wibox.layout.fixed.vertical()
+    --bot_layout:add(wibox.widget.systray)
+    bot_layout:add(systray)
     bot_layout:add(mailwidget)
     bot_layout:add(my_bat)
     bot_layout:add(my_volume)
