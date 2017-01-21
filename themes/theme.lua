@@ -2,8 +2,8 @@ theme                               = {}
 
 theme.wallpaper                     = "~/.background.png"
 
-theme.font                          = "xos4 Terminus regular 11"
---theme.taglist_font                  = "Liberation Mono 11"
+theme.font                          = "Cantarell 11"
+theme.naughty_font                  = "Monospace Regular"
 
 theme.color_dark                    = "#111111"
 theme.color_light                   = "#222222"

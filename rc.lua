@@ -19,7 +19,7 @@ local lain = require("lain")
 naughty.config.defaults.position = "bottom_left"
 naughty.config.icon_dirs = {"/usr/share/icons/Surfn/48/notifications/"}
 naughty.config.icon_formats = {"png", "svg"}
-naughty.config.defaults.font = beautiful.font
+naughty.config.defaults.font = beautiful.naughty_font
 -- }}}
 
 
@@ -165,9 +165,9 @@ end
 beautiful.init("~/.config/awesome/themes/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "xfce4-terminal"
+terminal = "xterm"
 editor = os.getenv("EDITOR") or "vim"
-editor_cmd = terminal .. " -x " .. editor
+editor_cmd = terminal .. " -e " .. editor
 
 -- Custom variables
 hostname = io.popen("uname -n"):read()
@@ -464,7 +464,8 @@ end
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock("%H:%M")
 mytextclock:set_align("center")
-cal = lain.widgets.calendar.attach(mytextclock, {position = "bottom_left"})
+cal = lain.widgets.calendar.attach(mytextclock, {font = beautiful.naughty_font, cal = "/usr/bin/khal", position = "bottom_left", icons = "/home"})
+--cal.font = beautiful.naughty_font
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
