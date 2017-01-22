@@ -13,6 +13,7 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 
 local common = require("awful.widget.common")
 local lain = require("lain")
+local vicious = require("vicious")
 
 
 -- {{{ Notifications position and border width
@@ -186,13 +187,13 @@ end
 --awful.util.spawn_with_shell("wmctrl -x -a conky || conky")
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
-run_once("kbdd")
+--run_once("kbdd")
 --run_once("conky")
 run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
 run_once("syndaemon -d -k -i 1")
 --run_once("xfce4-power-manager")
 --run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
---run_once("xcompmgr &")
+--run_once("xcompmgr")
 --run_once("xset s 180 180")
 
 --}}
@@ -457,7 +458,15 @@ if hostname == "arch" then
 	systray.left = 11
 	systray.right = 11
 end
---systray.
+-- Memory widget
+my_mem = wibox.container.margin()
+my_mem:setup {
+    id = "mmr",
+    widget = lain.widgets.mem(),
+    widget:set_align("center"),
+    widget:set_text(mem_now.used),
+}
+my_mem.top = "3"
 -- }}}
 
 -- {{{ Wibar
@@ -530,8 +539,12 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({"➊", "➋", "➌", "➍"}, s, awful.layout.layouts[2])
-
+    awful.tag.add("➊", {
+        layout = awful.layout.suit.tile,
+        screen = s,
+        master_count = 2,
+    })
+    awful.tag({"➋", "➌", "➍"}, s, awful.layout.layouts[2])
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
@@ -565,6 +578,7 @@ awful.screen.connect_for_each_screen(function(s)
     mid_layout:add(s.mytasklist)
     local bot_layout = wibox.layout.fixed.vertical()
     --bot_layout:add(wibox.widget.systray)
+    bot_layout:add(my_mem)
     bot_layout:add(systray)
     bot_layout:add(mailwidget)
     bot_layout:add(my_bat)
