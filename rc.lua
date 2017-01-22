@@ -309,7 +309,6 @@ mykeyboardlayout.widget.align = "center"
 
 -- {{{ Custom widgets
 mailwidget = wibox.container.margin()
-mailwidget.top = "3"
 
 mailwidget_buttons = awful.util.table.join(
     awful.button({ }, 1, function () awful.spawn("geary") end)
@@ -463,12 +462,11 @@ my_mem = wibox.container.margin(
         align = "center",
         widget = lain.widgets.mem{
             settings = function()
-                widget:set_text(math.floor(mem_now.used * 1.048576))
+                widget:set_text("☢" .. math.floor(mem_now.used * 1.048576))
             end
         },
         top = 3,
 })
-my_mem.top = "3"
 -- }}}
 
 -- {{{ Wibar
