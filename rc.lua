@@ -13,7 +13,6 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 
 local common = require("awful.widget.common")
 local lain = require("lain")
-local vicious = require("vicious")
 
 
 -- {{{ Notifications position and border width
@@ -459,13 +458,16 @@ if hostname == "arch" then
 	systray.right = 11
 end
 -- Memory widget
-my_mem = wibox.container.margin()
-my_mem:setup {
-    id = "mmr",
-    widget = lain.widgets.mem(),
-    widget:set_align("center"),
-    widget:set_text(mem_now.used),
-}
+my_mem = wibox.container.margin(
+    wibox.widget {
+        align = "center",
+        widget = lain.widgets.mem{
+            settings = function()
+                widget:set_text(math.floor(mem_now.used * 1.048576))
+            end
+        },
+        top = 3,
+})
 my_mem.top = "3"
 -- }}}
 
@@ -539,12 +541,9 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag.add("➊", {
-        layout = awful.layout.suit.tile,
-        screen = s,
-        master_count = 2,
-    })
-    awful.tag({"➋", "➌", "➍"}, s, awful.layout.layouts[2])
+    mytag = awful.tag({"➊", "➋", "➌", "➍"}, s, awful.layout.layouts[2])
+    awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
+--   mytag.incnmaster(2)
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
