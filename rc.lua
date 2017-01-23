@@ -328,6 +328,7 @@ mailwidget:setup {
     id = "root",
     layout = wibox.layout.fixed.vertical
 }
+mailwidget.top = 0
 mailwidget_tip = awful.tooltip({ objects = { mailwidget }})
 mailwidgettimer = gears.timer({ timeout = 60 })
 pr_mail = 0
@@ -575,8 +576,8 @@ awful.screen.connect_for_each_screen(function(s)
     mid_layout:add(s.mytasklist)
     local bot_layout = wibox.layout.fixed.vertical()
     --bot_layout:add(wibox.widget.systray)
-    bot_layout:add(my_mem)
     bot_layout:add(systray)
+    bot_layout:add(my_mem)
     bot_layout:add(mailwidget)
     bot_layout:add(my_bat)
     bot_layout:add(my_volume)
@@ -846,6 +847,7 @@ awful.rules.rules = {
           "pinentry",
           "veromix",
           "xtightvncviewer",
+	  "Keepassx2",
           "SpeedCrunch"},
 
         name = {
