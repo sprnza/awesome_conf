@@ -334,7 +334,7 @@ mailwidget:setup {
 }
 mailwidget.top = 0
 mailwidget_tip = awful.tooltip({ objects = { mailwidget }})
-mailwidgettimer = gears.timer({ timeout = 60 })
+mailwidgettimer = gears.timer({ timeout = 10 })
 pr_mail = 0
 wrk_mail = 0
 telegram = 0
@@ -475,8 +475,8 @@ my_mem = wibox.container.margin(
                 widget:set_text("☢" .. displ_mem)
             end
         },
-        top = 3,
 })
+my_mem.top = 3
 -- }}}
 
 -- {{{ Wibar
