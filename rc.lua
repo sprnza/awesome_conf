@@ -157,6 +157,10 @@ function verticaltask(w, buttons, label, data, objects)
    end
 end
 
+function round(num, numDecimalPlaces)
+	  local mult = 10^(numDecimalPlaces or 0)
+	    return math.floor(num * mult + 0.5) / mult
+end
 -- END OF CUSTOM FUNCTIONS}}}
 
 -- {{{ Variable definitions
@@ -463,7 +467,12 @@ my_mem = wibox.container.margin(
         align = "center",
         widget = lain.widgets.mem{
             settings = function()
-                widget:set_text("☢" .. math.floor(mem_now.used * 1.048576))
+		if (math.floor(mem_now.used) *1.048576) >= 1000 then
+			displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
+		else
+			displ_mem = math.floor(mem_now.used * 1.048676)
+		end
+                widget:set_text("☢" .. displ_mem)
             end
         },
         top = 3,
