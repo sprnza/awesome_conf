@@ -157,6 +157,10 @@ function verticaltask(w, buttons, label, data, objects)
    end
 end
 
+function round(num, numDecimalPlaces)
+	  local mult = 10^(numDecimalPlaces or 0)
+	    return math.floor(num * mult + 0.5) / mult
+end
 -- END OF CUSTOM FUNCTIONS}}}
 
 -- {{{ Variable definitions
@@ -328,8 +332,9 @@ mailwidget:setup {
     id = "root",
     layout = wibox.layout.fixed.vertical
 }
+mailwidget.top = 0
 mailwidget_tip = awful.tooltip({ objects = { mailwidget }})
-mailwidgettimer = gears.timer({ timeout = 60 })
+mailwidgettimer = gears.timer({ timeout = 10 })
 pr_mail = 0
 wrk_mail = 0
 telegram = 0
@@ -462,11 +467,16 @@ my_mem = wibox.container.margin(
         align = "center",
         widget = lain.widgets.mem{
             settings = function()
-                widget:set_text("☢" .. math.floor(mem_now.used * 1.048576))
+		if (math.floor(mem_now.used) *1.048576) >= 1000 then
+			displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
+		else
+			displ_mem = math.floor(mem_now.used * 1.048676)
+		end
+                widget:set_text("☢" .. displ_mem)
             end
         },
-        top = 3,
 })
+my_mem.top = 3
 -- }}}
 
 -- {{{ Wibar
@@ -589,8 +599,8 @@ awful.screen.connect_for_each_screen(function(s)
     mid_layout:add(s.mytasklist)
     local bot_layout = wibox.layout.fixed.vertical()
     --bot_layout:add(wibox.widget.systray)
-    bot_layout:add(my_mem)
     bot_layout:add(systray)
+    bot_layout:add(my_mem)
     bot_layout:add(mailwidget)
     bot_layout:add(my_bat)
     bot_layout:add(my_volume)
