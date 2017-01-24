@@ -531,6 +531,20 @@ local function set_wallpaper(s)
     end
 end
 
+clock = wibox ({bg = "#000000",
+                width = 300,
+                height = 200,
+                })
+clock.ontop = true
+clock.visible = false
+clock.opacity = "0.7"
+clock:geometry({x = 20, y = 50})
+
+clock_widget = wibox.widget.textclock('<span foreground="#db6823" font_family="Cantarell" size="65000">%H:%M</span>', 5)
+clock_widget:set_align("center")
+--clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'></span>")
+local clock_layout = wibox.layout.fixed.horizontal()
+clock:set_widget(clock_widget)
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
@@ -846,6 +860,8 @@ awful.rules.rules = {
           "pinentry",
           "veromix",
           "xtightvncviewer",
+          "Keepassx2",
+          "Tk",
           "SpeedCrunch"},
 
         name = {
