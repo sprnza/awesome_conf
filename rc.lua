@@ -426,6 +426,13 @@ settings = function()
             widget:set_markup(markup(beautiful.text_light,"♫" .. volume_now.level .. "%"))
             volnotify:notify(volume_now.level)
         end
+	if volume_now.level == "100" then
+            widget:set_markup(markup(beautiful.fg_urgent,"♫" .. "MAX"))
+            volnotify:notify(volume_now.level)
+        else
+            widget:set_markup(markup(beautiful.text_light,"♫" .. volume_now.level .. "%"))
+            volnotify:notify(volume_now.level)
+        end
     end
 })
 }
@@ -729,7 +736,9 @@ globalkeys = awful.util.table.join(
     end),
     -- Brightness buttons
     awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
-    awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end)
+    awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end),
+    -- Custom keybindings
+   awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end)
 )
 
 clientkeys = awful.util.table.join(
