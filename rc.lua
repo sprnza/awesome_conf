@@ -413,6 +413,7 @@ my_volume:setup {
     id = "vlm",
     widget = lain.widgets.alsa({timeout=1,
 settings = function()
+    if not awesome.startup then
         if volume_now.status == "off" then
             volume_now.level = "M"
             vol_state = volume_now.status
@@ -427,6 +428,7 @@ settings = function()
             volnotify:notify(volume_now.level)
         end
     end
+end
 })
 }
 my_volume:buttons(awful.util.table.join(
@@ -548,11 +550,11 @@ clock = wibox ({bg = "#000000",
 clock.ontop = true
 clock.visible = false
 clock.opacity = "0.7"
-clock:geometry({x = 20, y = 50})
-
-clock_widget = wibox.widget.textclock('<span foreground="#db6823" font_family="Cantarell" size="65000">%H:%M</span>', 5)
+clock:geometry({x = 20, y = 500})
+clock_widget = wibox.widget.textbox()
+value = 0
 clock_widget:set_align("center")
---clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'></span>")
+clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'>" .. value .. "</span>")
 local clock_layout = wibox.layout.fixed.horizontal()
 clock:set_widget(clock_widget)
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
@@ -585,12 +587,7 @@ awful.screen.connect_for_each_screen(function(s)
 
 
     -- Create the wibox
-    if hostname == "arch" then
-	    wdth = "44"
-    else
-	    wdth = "40"
-    end
-    s.mywibox = awful.wibar({ position = "left", screen = s, width = wdth})
+    s.mywibox = awful.wibar({ position = "left", screen = s, width = 44})
 
     -- Add widgets to the wibox
     local top_layout = wibox.layout.fixed.vertical()
