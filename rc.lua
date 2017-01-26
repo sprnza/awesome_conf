@@ -557,25 +557,11 @@ clock = wibox ({bg = "#000000",
 clock.ontop = true
 clock.visible = false
 clock.opacity = "0.7"
-<<<<<<< HEAD
 clock:geometry({x = 20, y = 500})
 clock_widget = wibox.widget.textbox()
 value = 0
-||||||| merged common ancestors
-clock:geometry({x = 20, y = 50})
-
-clock_widget = wibox.widget.textclock('<span foreground="#db6823" font_family="Cantarell" size="65000">%H:%M</span>', 5)
-=======
-clock:geometry({x = 20, y = 50})
-clock_widget = wibox.widget.textbox()
->>>>>>> 4ca18ec946e2f0495a937c84ecc5ec701116c323
 clock_widget:set_align("center")
-<<<<<<< HEAD
 clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'>" .. value .. "</span>")
-||||||| merged common ancestors
---clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'></span>")
-=======
->>>>>>> 4ca18ec946e2f0495a937c84ecc5ec701116c323
 local clock_layout = wibox.layout.fixed.horizontal()
 clock:set_widget(clock_widget)
 clock_timer = gears.timer ({ timeout = 1 })
