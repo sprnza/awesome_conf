@@ -427,6 +427,13 @@ settings = function()
             widget:set_markup(markup(beautiful.text_light,"♫" .. volume_now.level .. "%"))
             volnotify:notify(volume_now.level)
         end
+	if volume_now.level == "100" then
+            widget:set_markup(markup(beautiful.fg_urgent,"♫" .. "MAX"))
+            volnotify:notify(volume_now.level)
+        else
+            widget:set_markup(markup(beautiful.text_light,"♫" .. volume_now.level .. "%"))
+            volnotify:notify(volume_now.level)
+        end
     end
 end
 })
@@ -550,13 +557,44 @@ clock = wibox ({bg = "#000000",
 clock.ontop = true
 clock.visible = false
 clock.opacity = "0.7"
+<<<<<<< HEAD
 clock:geometry({x = 20, y = 500})
 clock_widget = wibox.widget.textbox()
 value = 0
+||||||| merged common ancestors
+clock:geometry({x = 20, y = 50})
+
+clock_widget = wibox.widget.textclock('<span foreground="#db6823" font_family="Cantarell" size="65000">%H:%M</span>', 5)
+=======
+clock:geometry({x = 20, y = 50})
+clock_widget = wibox.widget.textbox()
+>>>>>>> 4ca18ec946e2f0495a937c84ecc5ec701116c323
 clock_widget:set_align("center")
+<<<<<<< HEAD
 clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'>" .. value .. "</span>")
+||||||| merged common ancestors
+--clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'></span>")
+=======
+>>>>>>> 4ca18ec946e2f0495a937c84ecc5ec701116c323
 local clock_layout = wibox.layout.fixed.horizontal()
 clock:set_widget(clock_widget)
+clock_timer = gears.timer ({ timeout = 1 })
+clock_timer:connect_signal("timeout",
+	function()
+		clock.visible = true
+	if clock_counter ~= -1 then
+		m = math.floor(clock_counter / 60)
+		s = math.fmod(clock_counter, 60)
+		clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'>" .. string.format("%02.0f:%02d", m, s) .. "</span>")
+		clock_counter = clock_counter - 1
+	else
+		clock.visible = false
+		clock_timer:stop()
+		naughty.notify({text = "Finished!"})
+	end
+		
+	end	)
+			
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
@@ -740,7 +778,9 @@ globalkeys = awful.util.table.join(
     end),
     -- Brightness buttons
     awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
-    awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end)
+    awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end),
+    -- Custom keybindings
+   awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end)
 )
 
 clientkeys = awful.util.table.join(
