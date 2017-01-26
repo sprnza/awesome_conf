@@ -556,12 +556,27 @@ clock.ontop = true
 clock.visible = false
 clock.opacity = "0.7"
 clock:geometry({x = 20, y = 50})
-
-clock_widget = wibox.widget.textclock('<span foreground="#db6823" font_family="Cantarell" size="65000">%H:%M</span>', 5)
+clock_widget = wibox.widget.textbox()
 clock_widget:set_align("center")
---clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'></span>")
 local clock_layout = wibox.layout.fixed.horizontal()
 clock:set_widget(clock_widget)
+clock_timer = gears.timer ({ timeout = 1 })
+clock_timer:connect_signal("timeout",
+	function()
+		clock.visible = true
+	if clock_counter ~= -1 then
+		m = math.floor(clock_counter / 60)
+		s = math.fmod(clock_counter, 60)
+		clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'>" .. string.format("%02.0f:%02d", m, s) .. "</span>")
+		clock_counter = clock_counter - 1
+	else
+		clock.visible = false
+		clock_timer:stop()
+		naughty.notify({text = "Finished!"})
+	end
+		
+	end	)
+			
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
