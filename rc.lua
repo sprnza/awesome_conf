@@ -370,12 +370,16 @@ mailwidgettimer:connect_signal("timeout",
 mailwidgettimer:start()
 
 -- Volume widget stuff
-
+step = 3 -- is used in key bindings on order to notify properly
 function volume(action)
   local mixer
-  local alsa_channel = my_volume.vlm.channel
+  local alsa_channel = vlm.channel
   if action == "+" or action == "-" then
-      act = "3%" .. action
+      if volume_now.status == "off" then
+          act = "toggle"
+      else
+          act = step .. "%" .. action
+      end
   elseif action == "toggle" then
       act = action
   end
@@ -405,38 +409,27 @@ function volnotify:notify(vol)
     end
 end
 
-vol_state = nil
 my_volume = wibox.container.margin()
 my_volume.top = "3"
 
-my_volume:setup {
-    id = "vlm",
-    widget = lain.widgets.alsa({timeout=1,
+vlm = lain.widgets.alsa({timeout=1,
 settings = function()
     if not awesome.startup then
         if volume_now.status == "off" then
-            volume_now.level = "M"
-            vol_state = volume_now.status
-        end
-
-        widget:set_align("center")
-        if volume_now.level == "M" then
-            widget:set_markup(markup(beautiful.fg_urgent,"♫" .. volume_now.level))
-            volnotify:notify(volume_now.level)
+            widget:set_markup(markup(beautiful.fg_urgent,"♫M"))
         else
             widget:set_markup(markup(beautiful.text_light,"♫" .. volume_now.level .. "%"))
-            volnotify:notify(volume_now.level)
         end
-	if volume_now.level == "100" then
+	    if volume_now.level == "100" then
             widget:set_markup(markup(beautiful.fg_urgent,"♫" .. "MAX"))
-            volnotify:notify(volume_now.level)
-        else
-            widget:set_markup(markup(beautiful.text_light,"♫" .. volume_now.level .. "%"))
-            volnotify:notify(volume_now.level)
         end
+        widget:set_align("center")
     end
 end
 })
+my_volume:setup {
+    id = "vlm",
+    widget = vlm.widget
 }
 my_volume:buttons(awful.util.table.join(
     awful.button({ }, 1, function () volume("toggle") end),
@@ -448,12 +441,13 @@ my_volume:buttons(awful.util.table.join(
 my_bat = wibox.container.margin()
 my_bat.top = "3"
 my_bat.visible = false
-my_bat:setup {
-    widget = lain.widgets.bat({settings=function()
+    btt = lain.widgets.bat({settings=function()
         widget:set_text("⚕" .. bat_now.perc .. "%")
         widget:set_align("center")
     end
 })
+my_bat:setup {
+    widget = btt.widget
 }
 if hostname ~= "arch" then
 	my_bat.visible = true
@@ -493,7 +487,6 @@ my_mem.top = 3
 mytextclock = wibox.widget.textclock("%H:%M")
 mytextclock:set_align("center")
 cal = lain.widgets.calendar.attach(mytextclock, {font = beautiful.naughty_font, cal = "/usr/bin/khal", position = "bottom_left", icons = "/home"})
---cal.font = beautiful.naughty_font
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
@@ -748,19 +741,23 @@ globalkeys = awful.util.table.join(
               {description = "show the menubar", group = "launcher"}),
     -- ALSA volume
     awful.key({ }, "XF86AudioRaiseVolume", function() 
-        if vol_state == "off" then
-            volume("toggle")
-            my_volume.vlm.update()
-            vol_state = "on"
-        end
         volume("+") 
-        my_volume.vlm.update()
+        if volume_now.status == "on" then
+            volnotify:notify(string.format("%.0f", volume_now.level+step))
+        else
+            volnotify:notify(volume_now.level)
+        end
     end),
     awful.key({ }, "XF86AudioLowerVolume", function() volume("-")
-        my_volume.vlm.update()
+        volnotify:notify(string.format("%.0f", volume_now.level-step))
     end),
     awful.key({ }, "XF86AudioMute",        function() volume("toggle")
-        my_volume.vlm.update()
+        if volume_now.status == "on" then
+            volnotify:notify("M")
+        else
+            volnotify:notify(volume_now.level)
+        end
+
     end),
     -- Brightness buttons
     awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
