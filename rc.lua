@@ -465,19 +465,20 @@ if hostname == "arch" then
 	systray.right = 11
 end
 -- Memory widget
+mmr = lain.widgets.mem{
+    settings = function()
+if (math.floor(mem_now.used) *1.048576) >= 1000 then
+    displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
+else
+    displ_mem = math.floor(mem_now.used * 1.048676)
+end
+        widget:set_text("☢" .. displ_mem)
+    end
+}
 my_mem = wibox.container.margin(
     wibox.widget {
         align = "center",
-        widget = lain.widgets.mem{
-            settings = function()
-		if (math.floor(mem_now.used) *1.048576) >= 1000 then
-			displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
-		else
-			displ_mem = math.floor(mem_now.used * 1.048676)
-		end
-                widget:set_text("☢" .. displ_mem)
-            end
-        },
+        widget = mmr.widget
 })
 my_mem.top = 3
 -- }}}
@@ -486,7 +487,7 @@ my_mem.top = 3
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock("%H:%M")
 mytextclock:set_align("center")
-cal = lain.widgets.calendar.attach(mytextclock, {font = beautiful.naughty_font, cal = "/usr/bin/khal", position = "bottom_left", icons = "/home"})
+cal = lain.widgets.calendar.attach(mytextclock, {font = beautiful.naughty_font, cal = "/usr/bin/cal", position = "bottom_left", icons = "/home"})
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
