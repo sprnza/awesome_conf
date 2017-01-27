@@ -17,7 +17,7 @@ local lain = require("lain")
 
 -- {{{ Notifications position and border width
 naughty.config.defaults.position = "bottom_left"
-naughty.config.icon_dirs = {"/usr/share/icons/Surfn/48/notifications/"}
+naughty.config.icon_dirs = {os.getenv("HOME") .. "/.config/awesome/themes/icons/"}
 naughty.config.icon_formats = {"png", "svg"}
 naughty.config.defaults.font = beautiful.naughty_font
 -- }}}
