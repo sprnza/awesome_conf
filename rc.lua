@@ -244,7 +244,7 @@ local function client_menu_toggle_fn()
     end
 end
 function b_notify()
-        brt = io.popen("xbacklight")
+        brt = io.popen("light")
         brt = brt:read("*a")
         brt = math.floor(tonumber(brt)/5+0.5)*5
         local icon = nil
