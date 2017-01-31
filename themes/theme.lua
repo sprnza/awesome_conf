@@ -33,6 +33,7 @@ theme.tooltip_fg                    = theme.text_light
 theme.tooltip_border_width          = "1"
 theme.bg_systray                    = theme.color_light
 
+theme.menu_width                    = "150"
 -- icon used when a client has no default
 theme.generic_icon = "/usr/share/icons/Menda-Circle/apps/48x48/apps/utilities-terminal.svg"
 
