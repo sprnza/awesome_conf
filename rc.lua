@@ -283,7 +283,7 @@ powerMenu = {
     { "Shutdown", "systemctl poweroff" }
 }
 internetMenu = {
-    { "Firefox", "firefox" },
+    { "Firefox Nusha", "env GTK_THEME=Greybird firefox" },
     { "Luakit", "luakit" },
     { "Telegram", "telegram-desktop" },
     { "Geary", "geary"}
@@ -767,7 +767,11 @@ globalkeys = awful.util.table.join(
     awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
     awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end),
     -- Custom keybindings
-   awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end)
+   awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end),
+   awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Nusha")          end,
+              {description = "launch Nusha's Firefox", group = "custom"}),
+   awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Sprnza")          end,
+              {description = "launch Firefox", group = "custom"})
 )
 
 clientkeys = awful.util.table.join(
