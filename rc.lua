@@ -920,6 +920,8 @@ awful.rules.rules = {
     -- Set Firefox to always map on the tag named "2" on screen 1.
      { rule = { class = "Firefox" },
        properties = { screen = 1, tag = "➋" } },
+     { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
+       properties = { screen = 1, tag = "➌" } },
      { rule_any = { class = { "Geary", "TelegramDesktop" } },
        properties = { screen = 1, tag = "➍", callback =  function()
                         if not awesome.startup then    
