@@ -893,7 +893,7 @@ awful.rules.rules = {
           "xtightvncviewer",
           "Keepassx2",
           "Tk",
-          "mpv",
+         -- "mpv",
           "SpeedCrunch"},
 
         name = {
