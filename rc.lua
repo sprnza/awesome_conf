@@ -16,10 +16,12 @@ local lain = require("lain")
 
 
 -- {{{ Notifications position and border width
-naughty.config.defaults.position = "bottom_left"
+naughty.config.presets.normal.position = "bottom_left"
 naughty.config.icon_dirs = {os.getenv("HOME") .. "/.config/awesome/themes/icons/"}
 naughty.config.icon_formats = {"png", "svg"}
-naughty.config.defaults.font = beautiful.naughty_font
+naughty.config.presets.normal.font = "Monospace Regular 10"
+naughty.config.presets.normal.bg = "#222222"
+naughty.config.presets.normal.fg = "#999999"
 -- }}}
 
 
@@ -490,7 +492,7 @@ my_mem.top = 3
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock("%H:%M")
 mytextclock:set_align("center")
-cal = lain.widgets.calendar({attach_to = {mytextclock}, font = beautiful.naughty_font, cal = "/usr/bin/khal", position = "bottom_left", icons = "/"})
+cal = lain.widgets.calendar({attach_to = {mytextclock},  cal = "/usr/bin/khal", notification_preset = naughty.config.presets.normal, icons = "/"})
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
