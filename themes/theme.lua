@@ -8,7 +8,7 @@ theme.naughty_font                  = "Monospace Regular"
 theme.color_dark                    = "#111111"
 theme.color_light                   = "#222222"
 theme.highlight_dark                = "#336699"
-theme.highlight_light               = "#88AADD"
+theme.highlight_light               = "#2D63B5"
 theme.text_dark                     = "#999999"
 theme.text_light                    = "#EEEEEE"
 
