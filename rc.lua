@@ -192,16 +192,17 @@ end
 --awful.util.spawn_with_shell("wmctrl -x -a conky || conky")
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
---run_once("kbdd")
+run_once("kbdd")
 --run_once("conky")
-run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
-run_once("syndaemon -d -k -i 1")
 --run_once("xfce4-power-manager")
---run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
+run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
 --run_once("xcompmgr")
---run_once("xset s 180 180")
+run_once("xset s 180 180")
 if hostname ~= "arch" then
 	run_once("numlockx on")
+elseif hostmane ~= "laptop" then
+	run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
+	run_once("syndaemon -d -k -i 1")
 end
 
 --}}
@@ -311,11 +312,11 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 
 -- Keyboard map indicator and switcher
 --local mykeyboardlayout = wibox.widget.textbox()
-mykeyboardlayout = awful.widget.keyboardlayout:new()
-mykeyboardlayout.widget.align = "center"
+kbdwidget = awful.widget.keyboardlayout:new()
+kbdwidget.widget.align = "center"
 
 --mykeyboardlayout:set_text(kbw)
-
+--]]
 -- {{{ Custom widgets
 mailwidget = wibox.container.margin()
 
@@ -624,7 +625,7 @@ awful.screen.connect_for_each_screen(function(s)
     bot_layout:add(mailwidget)
     bot_layout:add(my_bat)
     bot_layout:add(my_volume)
-    bot_layout:add(mykeyboardlayout)
+    bot_layout:add(kbdwidget)
     bot_layout:add(s.mylayoutbox)
     bot_layout:add(mytextclock)
     
