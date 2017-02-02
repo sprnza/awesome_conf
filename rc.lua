@@ -198,9 +198,9 @@ run_once("kbdd")
 run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
 --run_once("xcompmgr")
 run_once("xset s 180 180")
-if hostname ~= "arch" then
+if hostname == "arch" then
 	run_once("numlockx on")
-elseif hostmane ~= "laptop" then
+elseif hostname == "laptop" then
 	run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
 	run_once("syndaemon -d -k -i 1")
 end
