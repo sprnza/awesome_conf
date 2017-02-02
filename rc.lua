@@ -287,6 +287,7 @@ powerMenu = {
 }
 internetMenu = {
     { "Firefox Nusha", "env GTK_THEME=Greybird firefox" },
+    { "Skype", "skype" },
     { "Luakit", "luakit" },
     { "Telegram", "telegram-desktop" },
     { "Geary", "geary"}
@@ -447,7 +448,10 @@ my_volume:buttons(awful.util.table.join(
 my_bat = wibox.container.margin()
 my_bat.top = "3"
 my_bat.visible = false
-    btt = lain.widgets.bat({settings=function()
+    btt = lain.widgets.bat({
+        bat_notification_low_preset = naughty.config.presets.normal,
+        bat_notification_critical_preset = naughty.config.presets.critical,
+        settings=function()
         widget:set_text("⚕" .. bat_now.perc .. "%")
         widget:set_align("center")
     end
