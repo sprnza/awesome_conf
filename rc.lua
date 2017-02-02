@@ -493,7 +493,7 @@ my_mem.top = 3
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock("%H:%M")
 mytextclock:set_align("center")
-cal = lain.widgets.calendar({attach_to = {mytextclock}, cal = "/usr/bin/cal --color=always", notification_preset = naughty.config.presets.normal, icons = "/"})
+cal = lain.widgets.calendar({attach_to = {mytextclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = naughty.config.presets.normal, icons = "/"})
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
