@@ -452,7 +452,7 @@ if hostname ~= "arch" then
 my_bat = wibox.container.margin()
 my_bat.top = "3"
 my_bat_tip = awful.tooltip({ objects = {my_bat}})
-my_bat.visible = false
+my_bat.visible = true
 local mpstat = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh mpstat"
 local xget = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh xset"
 mpres = 0
