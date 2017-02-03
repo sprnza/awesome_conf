@@ -448,7 +448,7 @@ my_volume:buttons(awful.util.table.join(
     awful.button({ }, 5, function () volume("-") end)
     ))
 -- Battery widget stuff
-
+if hostname ~= "arch" then
 my_bat = wibox.container.margin()
 my_bat.top = "3"
 my_bat_tip = awful.tooltip({ objects = {my_bat}})
@@ -558,8 +558,6 @@ my_bat:buttons(awful.util.table.join(
   end)
 ))
 
-if hostname ~= "arch" then
-	my_bat.visible = true
 end
 
 -- Systray widget
@@ -726,7 +724,9 @@ awful.screen.connect_for_each_screen(function(s)
     bot_layout:add(systray)
     bot_layout:add(my_mem)
     bot_layout:add(mailwidget)
+    if hostname ~= "arch" then
     bot_layout:add(my_bat)
+    end
     bot_layout:add(my_volume)
     bot_layout:add(kbdwidget)
     bot_layout:add(s.mylayoutbox)
