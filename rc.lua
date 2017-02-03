@@ -273,7 +273,7 @@ function b_notify()
 end
 
 function translate()
-    awful.spawn.easy_async("/home/speranza/.bin/trans.py", function(stdout, stderr, reason, exit_code)
+    awful.spawn.easy_async(os.getenv("HOME") .. "/.config/awesome/bin/trans.py", function(stdout, stderr, reason, exit_code)
         naughty.notify({ title = "Translation", text = string.gsub(stdout, "\n$", ""), icon = "dict" })
     end)
 end
