@@ -456,7 +456,6 @@ my_bat.visible = false
 local mpstat = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh mpstat"
 local xget = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh xset"
 mpres = 0
-global_i = 0
 DPMS = 0
 sleep = 0
 btt = lain.widgets.bat({
@@ -465,91 +464,96 @@ btt = lain.widgets.bat({
         settings=function()
             widget:set_text("⚕" .. bat_now.perc .. "%")
             widget:set_align("center")
-            if awesome.startup then
-                if bat_now.ac_status == 1 then
-                    xset = true
+            if suspend ~= "manually" then
+                if awesome.startup then
+                    if bat_now.ac_status == 1 then
+                        xset = true
+                    else
+                        xset = false
+                    end
                 else
-                    xset = false
+                    awful.spawn.with_line_callback(mpstat, {
+                        stdout = function(line)
+                            mpres = line
+                        end})
                 end
-            else
-                awful.spawn.with_line_callback(mpstat, {
-                    stdout = function(line)
-                        mpres = line
-                    end})
-            end
-            local apps = {"Vlc", "Deadbeef"}
-            local clients = client.get()
-            local i = 0
-            for _, appsValue in pairs(apps) do
-                for _, clientsValue in pairs(clients) do
-                    if clientsValue.class == appsValue then
-                        i = i + 1
+                local apps = {"Vlc", "Deadbeef"}
+                local clients = client.get()
+                local i = 0
+                for _, appsValue in pairs(apps) do
+                    for _, clientsValue in pairs(clients) do
+                        if clientsValue.class == appsValue then
+                            i = i + 1
+                        end
                     end
                 end
-            end
-            global_i = i
-            if i > 0 or tonumber(mpres) >= 5 and suspend == "enabled" then
-                awful.spawn("xautolock -disable")
-                awful.spawn("xset s -dpms")
-                suspend = "disabled"
-                my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
-            elseif i == 0 and tonumber(mpres) < 5 and suspend == "disabled" then
-                awful.spawn("xautolock -enable")
-                awful.spawn("xset s +dpms")
-                suspend = "enabled"
---                xgetres = {}
---                awful.spawn.with_line_callback(xget, {
---                    stdout = function(line)
---                        for i in string.gmatch(line, "%S+") do
---                            table.insert(xgetres, i)
---                        end
---                    end})
---                if xgetres[2] == "Enabled" then
-                my_bat_tip:set_text("DPMS\t" .. DPMS .. "min\nSleep\t" .. sleep)
---                end
-
-            end
-            if suspend == "enabled" then
-                if bat_now.ac_status == 1 and xset then -- transition from battery to ac
-                    awful.spawn("xset s 300 300")
+                if i > 0 or tonumber(mpres) >= 5 and suspend == "enabled" then
                     awful.spawn("xautolock -disable")
-                    DPMS=5
-                    sleep="disabled"
-                    xset = false
-                    if not awesome.startup then
-                        naughty.notify({text = "Power connected"})
-                    end
-                    my_bat_tip:set_text("DPMS\t" .. DPMS .. "min\nSleep\t" .. sleep)
-                elseif bat_now.ac_status == 0 and not xset then --transition from ac to battery
-                    awful.spawn("xset s 180 180")
+                    awful.spawn("xset s -dpms")
+                    suspend = "disabled"
+                    my_bat.root.bgd:set_bg("#7A4000")
+                    my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
+                elseif i == 0 and tonumber(mpres) < 5 and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
-                    DPMS=3
-                    sleep="5 min"
-                    xset = true
-                    if not awesome.startup then
-                        naughty.notify({text = "Power disconnected"})
-                    end
+                    awful.spawn("xset s +dpms")
+                    suspend = "enabled"
+                    my_bat.root.bgd:set_bg(theme.bg_normal)
                     my_bat_tip:set_text("DPMS\t" .. DPMS .. "min\nSleep\t" .. sleep)
+    --                end
+
+                end
+                if suspend == "enabled" then
+                    if bat_now.ac_status == 1 and xset then -- transition from battery to ac
+                        awful.spawn("xset s 300 300")
+                        awful.spawn("xautolock -disable")
+                        DPMS=5
+                        sleep="disabled"
+                        xset = false
+                        if not awesome.startup then
+                            naughty.notify({text = "Power connected"})
+                        end
+                        my_bat_tip:set_text("DPMS\t" .. DPMS .. "min\nSleep\t" .. sleep)
+                    elseif bat_now.ac_status == 0 and not xset then --transition from ac to battery
+                        awful.spawn("xset s 180 180")
+                        awful.spawn("xautolock -enable")
+                        DPMS=3
+                        sleep="5 min"
+                        xset = true
+                        if not awesome.startup then
+                            naughty.notify({text = "Power disconnected"})
+                        end
+                        my_bat_tip:set_text("DPMS\t" .. DPMS .. "min\nSleep\t" .. sleep)
+                    end
                 end
             end
     end
 })
 my_bat:setup {
-    widget = btt.widget
+    {
+        {
+            id = "lain_bat",
+            widget = btt.widget
+        },
+        id = "bgd",
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.fixed.vertical
 }
---my_bat_tip:set_text("DPMS\t" .. "3 min\nSleep\t" .."5 min")
 my_bat:buttons(awful.util.table.join(
   awful.button({ }, 1, function() --click to disable suspend
     if suspend == "enabled" then
         awful.util.spawn("xset s -dpms")
         awful.util.spawn("xautolock -disable")
-        suspend = "disabled"
+        suspend = "manually"
+        my_bat.root.bgd:set_bg("#7A4000")
         my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
     else
         awful.util.spawn("xset s +dpms")
         awful.util.spawn("xautolock -enable")
         suspend = "enabled"
-        my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
+        my_bat.root.bgd:set_bg(theme.bg_normal)
+        my_bat_tip:set_text("DPMS\t" .. DPMS .. "min\nSleep\t" .. sleep)
     end
   end)
 ))
