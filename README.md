@@ -2,6 +2,7 @@
 # Requirements
 ## Apps
 [light](https://github.com/haikarainen/light)
+sysstat
 ## Libraries
 lain
 ##Scripts
