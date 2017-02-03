@@ -461,6 +461,7 @@ sleep = 0
 btt = lain.widgets.bat({
         bat_notification_low_preset = naughty.config.presets.normal,
         bat_notification_critical_preset = naughty.config.presets.critical,
+        timeout = 60,
         settings=function()
             widget:set_text("⚕" .. bat_now.perc .. "%")
             widget:set_align("center")
