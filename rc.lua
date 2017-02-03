@@ -19,7 +19,7 @@ local lain = require("lain")
 naughty.config.presets.normal.position = "bottom_left"
 naughty.config.icon_dirs = {os.getenv("HOME") .. "/.config/awesome/themes/icons/"}
 naughty.config.icon_formats = {"png", "svg"}
-naughty.config.presets.normal.font = "Monospace Regular 10"
+naughty.config.presets.normal.font = "Monospace Regular 11"
 naughty.config.presets.normal.bg = "#222222"
 naughty.config.presets.normal.fg = "#999999"
 -- }}}
@@ -271,6 +271,13 @@ function b_notify()
         end
         nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id 
 end
+
+function translate()
+    awful.spawn.easy_async("/home/speranza/.bin/trans.py", function(stdout, stderr, reason, exit_code)
+        naughty.notify({ title = "Translation", text = string.gsub(stdout, "\n$", ""), icon = "dict" })
+    end)
+end
+
 -- }}}
 
 -- {{{ Menu
@@ -494,6 +501,7 @@ btt = lain.widgets.bat({
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
+                    naughty.notify({text="I=" .. i .. ", mpres =" .. tonumber(mpres)})
                 elseif i == 0 and tonumber(mpres) < 5 and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
                     awful.spawn("xset s +dpms")
@@ -878,7 +886,9 @@ globalkeys = awful.util.table.join(
    awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Nusha")          end,
               {description = "launch Nusha's Firefox", group = "custom"}),
    awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Sprnza")          end,
-              {description = "launch Firefox", group = "custom"})
+              {description = "launch Firefox", group = "custom"}),
+   awful.key({ modkey, "Shift" }, "t",     translate,
+              {description = "Translate selected text using Yandex.Translate", group = "custom"})
 )
 
 clientkeys = awful.util.table.join(
