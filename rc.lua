@@ -510,7 +510,7 @@ btt = lain.widgets.bat({
                     awful.spawn("xset s " .. DPMS)
                     suspend = "enabled"
                     my_bat.root.bgd:set_bg(theme.bg_normal)
-                    my_bat_tip:set_text("DPMS\t" .. DPMS .. " min\nSleep\t" .. sleep)
+                    my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
     --                end
 
                 end
