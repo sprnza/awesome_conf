@@ -501,6 +501,7 @@ btt = lain.widgets.bat({
                 if i > 0 or tonumber(mpres) >= 5 and tonumber(mpres_prev) >= 5 and suspend == "enabled" then
                     awful.spawn("xautolock -disable")
                     awful.spawn("xset s off")
+                    mpres_prev = 0
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
