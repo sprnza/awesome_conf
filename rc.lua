@@ -498,19 +498,20 @@ btt = lain.widget.bat({
                         end
                     end
                 end
-                if i > 0 or tonumber(mpres) >= 5 and tonumber(mpres_prev) >= 5 and suspend == "enabled" then
+                if i > 0 or tonumber(mpres) >= 15 and tonumber(mpres_prev) >= 5 and suspend == "enabled" then
                     awful.spawn("xautolock -disable")
                     awful.spawn("xset s off")
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
                     naughty.notify({text="I=" .. i .. ", mpres =" .. tonumber(mpres) .. ", mpres_prev =" .. tonumber(mpres_prev)})
+                    mpres_prev = 0
                 elseif i == 0 and tonumber(mpres) < 5 and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
                     awful.spawn("xset s " .. DPMS)
                     suspend = "enabled"
                     my_bat.root.bgd:set_bg(theme.bg_normal)
-                    my_bat_tip:set_text("DPMS\t" .. DPMS .. " min\nSleep\t" .. sleep)
+                    my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
     --                end
 
                 end
@@ -891,6 +892,8 @@ globalkeys = awful.util.table.join(
    awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Sprnza")          end,
               {description = "launch Firefox", group = "custom"}),
    awful.key({ modkey, "Shift" }, "t",     translate,
+              {description = "Translate selected text using Yandex.Translate", group = "custom"}),
+   awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
               {description = "Translate selected text using Yandex.Translate", group = "custom"})
 )
 
