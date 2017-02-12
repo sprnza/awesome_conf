@@ -196,19 +196,20 @@ run_once("kbdd")
 --run_once("conky")
 --run_once("xfce4-power-manager")
 --run_once("xcompmgr")
-DPMS=180
-run_once("xset s " .. DPMS)
 if hostname == "arch" then
-	run_once("numlockx on")
+    DPMS=600
+    run_once("numlockx on")
     run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
 elseif hostname == "laptop" then
 	run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
 	run_once("syndaemon -d -k -i 1")
     run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
+    DPMS=180
     suspend = "enabled"
     --xset = true -- true=battery(180s), false=AC(300s) it's being set inside battery widget callback function
     lock = true -- 1=enabled, 0=disabled
 end
+run_once("xset s " .. DPMS)
 
 --}}
 
