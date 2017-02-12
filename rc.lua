@@ -431,7 +431,7 @@ end
 my_volume = wibox.container.margin()
 my_volume.top = "3"
 
-vlm = lain.widgets.alsa({timeout=1,
+vlm = lain.widget.alsa({timeout=1,
 settings = function()
     if not awesome.startup then
         if volume_now.status == "off" then
@@ -467,7 +467,7 @@ mpres = 0
 mpres_prev = 0
 DPMS = 0
 sleep = 0
-btt = lain.widgets.bat({
+btt = lain.widget.bat({
         bat_notification_low_preset = naughty.config.presets.normal,
         bat_notification_critical_preset = naughty.config.presets.critical,
         timeout = 60,
@@ -584,7 +584,7 @@ if hostname == "arch" then
 	systray.right = 11
 end
 -- Memory widget
-mmr = lain.widgets.mem{
+mmr = lain.widget.mem{
     settings = function()
 if (math.floor(mem_now.used) *1.048576) >= 1000 then
     displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
@@ -606,7 +606,7 @@ my_mem.top = 3
 -- Create a textclock widget
 mytextclock = wibox.widget.textclock("%H:%M")
 mytextclock:set_align("center")
-cal = lain.widgets.calendar({attach_to = {mytextclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = naughty.config.presets.normal, icons = "/"})
+cal = lain.widget.calendar({attach_to = {mytextclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = naughty.config.presets.normal, icons = "/"})
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
