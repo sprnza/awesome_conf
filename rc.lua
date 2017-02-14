@@ -705,7 +705,6 @@ awful.screen.connect_for_each_screen(function(s)
 
     -- Each screen has its own tag table.
     mytag = awful.tag({"➊", "➋", "➌", "➍"}, s, awful.layout.layouts[2])
-    awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
 --   mytag.incnmaster(2)
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -1040,7 +1039,7 @@ awful.rules.rules = {
 
     -- Add titlebars to normal clients and dialogs
     { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = false }
+      }, properties = { titlebars_enabled = true }
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
@@ -1074,48 +1073,47 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
+
+    if #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 3 then
+        awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
+    end
+end)
+client.connect_signal("unmanage", function (c)
+    if #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 2 then
+        awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
+    end
 end)
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
+
     -- buttons for the titlebar
     local buttons = awful.util.table.join(
-        awful.button({ }, 1, function()
-            client.focus = c
-            c:raise()
-            awful.mouse.client.move(c)
-        end),
-        awful.button({ }, 3, function()
-            client.focus = c
-            c:raise()
-            awful.mouse.client.resize(c)
-        end)
-    )
+            awful.button({ }, 1, function()
+                client.focus = c
+                c:raise()
+                awful.mouse.client.move(c)
+            end)
+            )
 
-    awful.titlebar(c) : setup {
+    -- Minimize, Maximize, Close buttons
+    local right_layout = wibox.layout.flex.horizontal()
+    right_layout:add(awful.titlebar.widget.minimizebutton(c))
+    right_layout:add(awful.titlebar.widget.maximizedbutton(c))
+    right_layout:add(awful.titlebar.widget.closebutton(c))
+    right_layout.forced_width=150
 
-        { -- Left
-            awful.titlebar.widget.iconwidget(c),
-            buttons = buttons,
-            layout  = wibox.layout.fixed.horizontal
-        },
-        { -- Middle
-            { -- Title
-               align  = "center",
-                widget = awful.titlebar.widget.titlewidget(c)
-            },
-            buttons = buttons,
-            layout  = wibox.layout.flex.horizontal
-        },
-        { -- Right
-            awful.titlebar.widget.minimizebutton(c),
-            awful.titlebar.widget.maximizedbutton(c),
-            awful.titlebar.widget.closebutton    (c),
-            layout = wibox.layout.fixed.horizontal()
-        },
-        layout = wibox.layout.align.horizontal
-    }
-  
+    -- Dragable titlebar
+    local middle_layout = wibox.layout.flex.horizontal()
+    middle_layout:buttons(buttons)
+
+    -- Now bring it all together
+    local layout = wibox.layout.align.horizontal()
+    layout:set_right(right_layout)
+    layout:set_middle(middle_layout)
+
+    awful.titlebar(c,{size=7}):set_widget(layout) 
+    awful.titlebar.show(c)
 end)
 
 -- Enable sloppy focus, so that focus follows mouse.
@@ -1128,4 +1126,24 @@ end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+-- }}}
+
+-- {{{ Arrange signal handler
+for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
+        local clients = screen[s].clients
+        local layout  = awful.layout.getname(awful.layout.get(s))
+
+        if #clients > 0 then -- Fine grained borders and floaters control
+            for _, c in pairs(clients) do -- Floaters always have borders
+				if (c.maximized_horizontal == true and c.maximized_vertical == true) or layout == "tile" then
+					c.border_width = 0
+					awful.titlebar.hide(c)
+				else
+					c.border_width = beautiful.border_width
+					awful.titlebar.show(c)
+				end
+            end
+        end
+      end)
+end
 -- }}}

@@ -36,6 +36,20 @@ theme.bg_systray                    = theme.color_light
 theme.menu_width                    = "150"
 -- icon used when a client has no default
 theme.generic_icon = "/usr/share/icons/Menda-Circle/apps/48x48/apps/utilities-terminal.svg"
+-- titlebar buttons
+theme.tb_button                    = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_button.png"
+theme.tb_close_button                    = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_button.png"
+theme.tb_color                     = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_color.png"
+theme.titlebar_close_button_normal = theme.tb_color
+theme.titlebar_close_button_focus  = theme.tb_close_button
+theme.titlebar_maximized_button_normal_inactive = theme.tb_color
+theme.titlebar_maximized_button_focus_inactive = theme.tb_button
+theme.titlebar_maximized_button_normal_active = theme.tb_color
+theme.titlebar_maximized_button_focus_active = theme.tb_button
+theme.titlebar_minimize_button_normal_inactive = theme.tb_color
+theme.titlebar_minimize_button_focus_inactive = theme.tb_button
+theme.titlebar_minimize_button_normal_active = theme.tb_color
+theme.titlebar_minimize_button_focus_active = theme.tb_button
 
 -- layout images
 theme.icon_dir                      = "/usr/share/awesome/themes/default/layouts"
