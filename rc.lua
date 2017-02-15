@@ -464,10 +464,11 @@ my_bat_tip = awful.tooltip({ objects = {my_bat}})
 my_bat.visible = true
 local mpstat = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh mpstat"
 local xget = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh xset"
-mpres = 0
-mpres_prev = 0
+local ff_tabs = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh firefox_tabs"
 DPMS = 0
 sleep = 0
+check_tabs = {"youtube.com"}
+tabs = {}
 btt = lain.widget.bat({
         bat_notification_low_preset = naughty.config.presets.normal,
         bat_notification_critical_preset = naughty.config.presets.critical,
@@ -475,6 +476,7 @@ btt = lain.widget.bat({
         settings=function()
             widget:set_text("⚕" .. bat_now.perc .. "%")
             widget:set_align("center")
+            triggerTab = false
             if suspend ~= "manually" then
                 if awesome.startup then
                     if bat_now.ac_status == 1 then
@@ -483,10 +485,10 @@ btt = lain.widget.bat({
                         xset = false
                     end
                 else
-                    mpres_prev = mpres
-                    awful.spawn.with_line_callback(mpstat, {
+                    awful.spawn.with_line_callback(ff_tabs, {
                         stdout = function(line)
-                            mpres = line
+                            tabs = line
+                            loadstring(tabs)()
                         end})
                 end
                 local apps = {"Vlc", "Deadbeef"}
@@ -499,15 +501,20 @@ btt = lain.widget.bat({
                         end
                     end
                 end
-                if i > 0 or tonumber(mpres) >= 15 and tonumber(mpres_prev) >= 5 and suspend == "enabled" then
+                for _, checkTab in pairs(check_tabs) do
+                    for _,currTab in pairs(tabs) do
+                        if currTab == checkTab then
+                            triggerTab = true
+                        end
+                    end
+                end
+                if i > 0 or triggerTab and suspend == "enabled" then
                     awful.spawn("xautolock -disable")
                     awful.spawn("xset s off")
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
-                    naughty.notify({text="I=" .. i .. ", mpres =" .. tonumber(mpres) .. ", mpres_prev =" .. tonumber(mpres_prev)})
-                    mpres_prev = 0
-                elseif i == 0 and tonumber(mpres) < 5 and suspend == "disabled" then
+                elseif i == 0 and not triggerTab and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
                     awful.spawn("xset s " .. DPMS)
                     suspend = "enabled"
@@ -1073,13 +1080,12 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
-
-    if #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 3 then
+    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 3 then
         awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
     end
 end)
 client.connect_signal("unmanage", function (c)
-    if #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 2 then
+    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 2 then
         awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
     end
 end)
@@ -1135,11 +1141,14 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
 
         if #clients > 0 then -- Fine grained borders and floaters control
             for _, c in pairs(clients) do -- Floaters always have borders
-				if (c.maximized_horizontal == true and c.maximized_vertical == true) or layout == "tile" then
+				if (c.maximized_horizontal == true and c.maximized_vertical == true) then
 					c.border_width = 0
+                else
+					c.border_width = beautiful.border_width
+                end
+                if layout == "tile" then
 					awful.titlebar.hide(c)
 				else
-					c.border_width = beautiful.border_width
 					awful.titlebar.show(c)
 				end
             end
