@@ -902,7 +902,7 @@ globalkeys = awful.util.table.join(
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
    awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
-   awful.key({ modkey, "Shift" }, "k",     function () awful.spawn("rofi-pass") end,
+   awful.key({ modkey, "Control" }, "k",     function () awful.spawn("rofi-pass") end,
               {description = "Password manager", group = "custom"})
 )
 
