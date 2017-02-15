@@ -492,11 +492,17 @@ btt = lain.widget.bat({
                         end})
                 end
                 local apps = {"Vlc", "Deadbeef"}
+                local roles = {"CallWindow"} --Skype's call window
                 local clients = client.get()
                 local i = 0
-                for _, appsValue in pairs(apps) do
-                    for _, clientsValue in pairs(clients) do
+                for _, clientsValue in pairs(clients) do
+                    for _, appsValue in pairs(apps) do
                         if clientsValue.class == appsValue then
+                            i = i + 1
+                        end
+                    end
+                    for _, rolesValue in pairs(roles) do
+                        if clientsValue.role == rolesValue then
                             i = i + 1
                         end
                     end
