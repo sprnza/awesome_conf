@@ -2,7 +2,8 @@
 # Requirements
 ## Apps
 [light](https://github.com/haikarainen/light)
-sysstat
+* sysstat
+* xfce4-screenshooter
 ## Libraries
 lain
 ##Scripts

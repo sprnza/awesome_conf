@@ -909,7 +909,13 @@ globalkeys = awful.util.table.join(
    awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
    awful.key({ modkey, "Control" }, "k",     function () awful.spawn("rofi-pass") end,
-              {description = "Password manager", group = "custom"})
+              {description = "Password manager", group = "custom"}),
+   awful.key({ }, "Print",     function () awful.spawn("xfce4-screenshooter -f") end,
+              {description = "Take a screenshot of the entire screen", group = "custom"}),
+   awful.key({"Control" }, "Print",     function () awful.spawn("xfce4-screenshooter -r") end,
+              {description = "Take a screenshot ot the selected region", group = "custom"}),
+   awful.key({"Mod1" }, "Print",     function () awful.spawn("xfce4-screenshooter -w") end,
+              {description = "Take a screenshot ot the active window", group = "custom"})
 )
 
 clientkeys = awful.util.table.join(
@@ -1086,13 +1092,15 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
-    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 3 then
+    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "➊"):clients()[3].floating ~= true  then
         awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
+        master_increased = true
     end
 end)
 client.connect_signal("unmanage", function (c)
-    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 2 then
+    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 2 and master_increased then
         awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
+        master_increased = false
     end
 end)
 
