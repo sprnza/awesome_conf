@@ -1,9 +1,10 @@
 # AwesomeWM configuration file
 # Requirements
 ## Apps
-[light](https://github.com/haikarainen/light)
+* [light](https://github.com/haikarainen/light)
 * sysstat
 * xfce4-screenshooter
+* redshift
 ## Libraries
 lain
 ##Scripts

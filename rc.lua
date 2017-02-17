@@ -193,7 +193,7 @@ end
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 run_once("kbdd")
---run_once("conky")
+run_once("redshift -o")
 --run_once("xfce4-power-manager")
 --run_once("xcompmgr")
 if hostname == "arch" then
@@ -469,6 +469,8 @@ DPMS = 0
 sleep = 0
 check_tabs = {"youtube.com"}
 tabs = {}
+fullscreenClient = false
+redshift = true
 btt = lain.widget.bat({
         bat_notification_low_preset = naughty.config.presets.normal,
         bat_notification_critical_preset = naughty.config.presets.critical,
@@ -501,11 +503,24 @@ btt = lain.widget.bat({
                             i = i + 1
                         end
                     end
+                    if clientsValue.fullscreen then
+                        fullscreenClient = true
+                        break
+                    else
+                        fullscreenClient = false
+                    end
                     for _, rolesValue in pairs(roles) do
                         if clientsValue.role == rolesValue then
                             i = i + 1
                         end
                     end
+                end
+                if fullscreenClient and redshift then
+                    awful.util.spawn("redshift -x >/dev/null 2>&1")
+                    redshift = false
+                elseif not fullscreenClient and not redshift then
+                    awful.util.spawn("redshift -o >/dev/null 2>&1")
+                    redshift = true
                 end
                 for _, checkTab in pairs(check_tabs) do
                     for _,currTab in pairs(tabs) do
@@ -552,6 +567,7 @@ btt = lain.widget.bat({
                         my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
                     end
                 end
+
             end
     end
 })
