@@ -587,6 +587,7 @@ my_bat:buttons(awful.util.table.join(
 
 end
 
+
 -- Systray widget
 systray = wibox.container.margin()
 systray:setup {
@@ -601,12 +602,12 @@ end
 -- Memory widget
 mmr = lain.widget.mem{
     settings = function()
-if (math.floor(mem_now.used) *1.048576) >= 1000 then
-    displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
-else
-    displ_mem = math.floor(mem_now.used * 1.048676)
-end
-        widget:set_text("☢" .. displ_mem)
+        if (math.floor(mem_now.used) *1.048576) >= 1000 then
+            displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
+        else
+            displ_mem = math.floor(mem_now.used * 1.048676)
+        end
+            widget:set_text("☢" .. displ_mem)
     end
 }
 my_mem = wibox.container.margin(
@@ -615,6 +616,62 @@ my_mem = wibox.container.margin(
         widget = mmr.widget
 })
 my_mem.top = 3
+
+-- Server monitoring widget
+local srv = wibox.widget.textbox()
+awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(widget, stdout)
+    local lines = {}
+    for line in stdout:gmatch("[^\r\n]+") do 
+        lines[#lines + 1] = line
+    end
+    srv_tip:set_markup(lines[1].."\nAverage load:\t\t" .. lines[2] .. "\nTemperature:\t\t" .. lines[3] .. "\nRoot/Home/Backup usage:\t" .. lines[4] .. "\nUpdates pending:\t" .. lines[5] .. "\nWashing:\t\t" .. lines[6]..":00".."\nRAM:\t\t\t"..lines[7].."\nUpdated at:\t\t" ..lines[8])
+    
+    if tonumber(lines[5]) > 10 then
+        srv_mon.root.bgd:set_bg("#70B9F8")
+        srv_tip:set_markup(lines[1].."\nAverage load:\t\t" .. lines[2] .. "\nTemperature:\t\t" .. lines[3] .. "\nRoot/Home/Backup usage:\t" .. lines[4] .. "<span background='#70B9F8' foreground='#222222'>\nUpdates pending:\t".. lines[5] .. "</span>\nWashing:\t\t" .. lines[6]..":00".."\nRAM:\t\t\t"..lines[7].."\nUpdated at:\t\t" ..lines[8])
+    end
+    if tonumber(string.match(lines[3], "%d+")) > 65 then
+        srv_mon.root.bgd:set_bg(theme.bg_urgent)
+        srv_tip:set_markup(lines[1].."\nAverage load:\t\t" .. lines[2] .. "<span background='#800000'>\nTemperature:\t\t" .. lines[3] .. "</span>\nRoot/Home/Backup usage:\t" .. lines[4] .. "\nUpdates pending:\t".. lines[5] .. "\nWashing:\t\t" .. lines[6]..":00".."\nRAM:\t\t\t"..lines[7].."\nUpdated at:\t\t" ..lines[8])
+    end
+    if tonumber(string.match(lines[7], "%d+")) > 999 then
+        srv_mon.roog.bgd:set_bg("#E9B952")
+    end
+end)
+local loc = wibox.widget.textbox()
+srv_mon = wibox.container.margin()
+srv_mon:setup {
+    {
+        {
+            id = "text",
+            text = "⚒",
+            align = "center",
+            widget = wibox.widget.textbox
+        },
+        id = "bgd",
+        widget = wibox.container.background
+    },
+--    {
+--        id = "separator",
+--        text = ":",
+--        align = "center",
+--        widget = wibox.widget.textbox
+--    },
+    {
+        {
+            id = "text_loc",
+            text = "⚔",
+            align = "center",
+            widget = wibox.widget.textbox
+        },
+        id = "bgd_loc",
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.flex.horizontal
+}
+srv_mon.top = 3
+srv_tip = awful.tooltip({ objects = { srv_mon.root.bgd }})
 -- }}}
 
 -- {{{ Wibar
@@ -748,6 +805,7 @@ awful.screen.connect_for_each_screen(function(s)
     local bot_layout = wibox.layout.fixed.vertical()
     --bot_layout:add(wibox.widget.systray)
     bot_layout:add(systray)
+    bot_layout:add(srv_mon)
     bot_layout:add(my_mem)
     bot_layout:add(mailwidget)
     if hostname ~= "arch" then

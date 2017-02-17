@@ -4,6 +4,7 @@ theme.wallpaper                     = "~/.background.png"
 
 theme.font                          = "Cantarell 11"
 theme.naughty_font                  = "Monospace Regular"
+theme.tooltip_font                  = "Monospace Regular 11"
 
 theme.color_dark                    = "#111111"
 theme.color_light                   = "#222222"
