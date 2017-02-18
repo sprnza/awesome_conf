@@ -15,4 +15,13 @@ firefox_tabs)
     fi
     echo "tabs = {\"$FF_curr\", \"$FF_curr_nush\"}"
     ;;
+mon)
+    output="$HOME/.bin/temp/local_status"
+    uptime -p > $output
+    uptime | grep -ohe 'load average[s:][: ].*' | awk '{ print $3" "$4" "$5}' >> $output
+    checkupdates|wc -l >> $output
+    df --output=pcent|sed -n -e 4p -e 8p|sed s/" "//g|tr '\n' ' '>> $output
+    echo "" >> $output
+    sensors|awk '/^Core 0/{print $3}' >>$output
+    ;;
 esac

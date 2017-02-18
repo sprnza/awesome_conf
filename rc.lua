@@ -634,27 +634,72 @@ my_mem = wibox.container.margin(
 my_mem.top = 3
 
 -- Server monitoring widget
-local srv = wibox.widget.textbox()
 awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(widget, stdout)
+    local avg_bg = theme.bg_normal
+    local temp_bg = theme.bg_normal
+    local hdd_bg = theme.bg_normal
+    local upd_bg = theme.bg_normal
+    local ram_bg = theme.bg_normal
+    local lines = {}
+    srv_mon.root.bgd:set_bg(theme.bg_normal)
+    for line in stdout:gmatch("[^\r\n]+") do 
+        lines[#lines + 1] = line
+    end
+    if tonumber(lines[5]) > 10 then
+        upd_bg = "#2943FF"
+        srv_mon.root.bgd:set_bg(upd_bg)
+    end
+    if tonumber(string.match(lines[3], "%d+")) > 65 then
+        temp_bg = "#800000"
+        srv_mon.root.bgd:set_bg(temp_bg)
+    end
+    if tonumber(string.match(lines[7], "%d+")) > 999 then
+        ram_bg = "#A52A2A"
+        srv_mon.root.bgd:set_bg(ram_bg)
+    end
+    local root, home, backup = string.match(lines[4], "^(%d+)%% (%d+)%% (%d+)%%")
+    if tonumber(root) > 50 or tonumber(home) > 80 or tonumber(backup) > 60 then
+        hdd_bg = "#739300"
+        srv_mon.root.bgd:set_bg(hdd_bg)
+    end
+    local five_min_load = string.match(lines[2], "^%d+.%d+, (%d+).%d+")
+    if tonumber(five_min_load) >= 1 then
+        avg_bg = "#FF0000"
+        srv_mon.root.bgd:set_bg(avg_bg)
+    end
+    srv_tip:set_markup("SERVER\n" .. lines[1].."<span background='" .. avg_bg .. "'>\nAverage load:\t\t" .. lines[2] .. "</span><span background='"..temp_bg .. "'>\nTemperature:\t\t" .. lines[3] .. "</span><span background='".. hdd_bg .. "'>\nRoot/Home/Backup usage:\t" .. lines[4] .. "</span><span background='" .. upd_bg .. "'>\nUpdates pending:\t".. lines[5] .. "</span>\nWashing:\t\t" .. lines[6]..":00".."<span background='" .. ram_bg.."'>\nRAM:\t\t\t"..lines[7].."</span>\nUpdated at:\t\t" ..lines[8])
+end)
+awful.widget.watch('bash -c "cat $HOME/.bin/temp/local_status"', 300, function(widget, stdout)
+    local avg_bg = theme.bg_normal
+    local temp_bg = theme.bg_normal
+    local hdd_bg = theme.bg_normal
+    local upd_bg = theme.bg_normal
+    local ram_bg = theme.bg_normal
+    srv_mon.root.bgd_loc:set_bg(theme.bg_normal)
     local lines = {}
     for line in stdout:gmatch("[^\r\n]+") do 
         lines[#lines + 1] = line
     end
-    srv_tip:set_markup(lines[1].."\nAverage load:\t\t" .. lines[2] .. "\nTemperature:\t\t" .. lines[3] .. "\nRoot/Home/Backup usage:\t" .. lines[4] .. "\nUpdates pending:\t" .. lines[5] .. "\nWashing:\t\t" .. lines[6]..":00".."\nRAM:\t\t\t"..lines[7].."\nUpdated at:\t\t" ..lines[8])
-    
-    if tonumber(lines[5]) > 10 then
-        srv_mon.root.bgd:set_bg("#70B9F8")
-        srv_tip:set_markup(lines[1].."\nAverage load:\t\t" .. lines[2] .. "\nTemperature:\t\t" .. lines[3] .. "\nRoot/Home/Backup usage:\t" .. lines[4] .. "<span background='#70B9F8' foreground='#222222'>\nUpdates pending:\t".. lines[5] .. "</span>\nWashing:\t\t" .. lines[6]..":00".."\nRAM:\t\t\t"..lines[7].."\nUpdated at:\t\t" ..lines[8])
+    if tonumber(lines[3]) > 10 then
+        upd_bg = "#2943FF"
+        srv_mon.root.bgd_loc:set_bg(upd_bg)
     end
-    if tonumber(string.match(lines[3], "%d+")) > 65 then
-        srv_mon.root.bgd:set_bg(theme.bg_urgent)
-        srv_tip:set_markup(lines[1].."\nAverage load:\t\t" .. lines[2] .. "<span background='#800000'>\nTemperature:\t\t" .. lines[3] .. "</span>\nRoot/Home/Backup usage:\t" .. lines[4] .. "\nUpdates pending:\t".. lines[5] .. "\nWashing:\t\t" .. lines[6]..":00".."\nRAM:\t\t\t"..lines[7].."\nUpdated at:\t\t" ..lines[8])
+    if tonumber(string.match(lines[5], "%d+")) > 65 then
+        temp_bg = "#800000"
+        srv_mon.root.bgd_loc:set_bg(temp_bg)
     end
-    if tonumber(string.match(lines[7], "%d+")) > 999 then
-        srv_mon.roog.bgd:set_bg("#E9B952")
+    local root, home = string.match(lines[4], "^(%d+)%% (%d+)%%")
+    if tonumber(root) > 60 or tonumber(home) > 60 then
+        hdd_bg = "#739300"
+        srv_mon.root.bgd_loc:set_bg(hdd_bg)
     end
+    local five_min_load = string.match(lines[2], "^%d+.%d+, (%d+).%d+")
+    if tonumber(five_min_load) >= 1 then
+        avg_bg = "#FF0000"
+        srv_mon.root.bgd:set_bg(avg_bg)
+    end
+    loc_tip:set_markup("This machine\n" .. lines[1].."<span background='"..avg_bg.."'>\nAverage load:\t\t" .. lines[2].. "</span><span background='"..temp_bg .. "'>\nTemperature:\t\t" .. lines[5] .. "</span><span background='".. hdd_bg .. "'>\nRoot/Home usage:\t" .. lines[4] .. "</span><span background='" .. upd_bg .. "'>\nUpdates pending:\t".. lines[3].."</span>")
 end)
-local loc = wibox.widget.textbox()
 srv_mon = wibox.container.margin()
 srv_mon:setup {
     {
@@ -667,12 +712,6 @@ srv_mon:setup {
         id = "bgd",
         widget = wibox.container.background
     },
---    {
---        id = "separator",
---        text = ":",
---        align = "center",
---        widget = wibox.widget.textbox
---    },
     {
         {
             id = "text_loc",
@@ -688,12 +727,34 @@ srv_mon:setup {
 }
 srv_mon.top = 3
 srv_tip = awful.tooltip({ objects = { srv_mon.root.bgd }})
+loc_tip = awful.tooltip({ objects = { srv_mon.root.bgd_loc}})
 -- }}}
 
 -- {{{ Wibar
 -- Create a textclock widget
-mytextclock = wibox.widget.textclock("%H:%M")
-mytextclock:set_align("center")
+--mytextclock:set_align("center")
+txtclock = wibox.container.margin()
+txtclock:setup {
+    {
+        {
+            id = "text",
+            align = "center",
+            widget = wibox.widget.textclock("%H:%M")
+        },
+        id = "bgd",
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.flex.horizontal
+}
+txtclock.top = 3
+awful.widget.watch('bash -c "khal at today"', 300, function(widget, stdout)
+    lines = {}
+    for line in stdout:gmatch("[^\r\n]+") do 
+        lines[#lines + 1] = line
+    end
+
+end)
 cal = lain.widget.calendar({attach_to = {mytextclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = naughty.config.presets.normal, icons = "/"})
 
 -- Create a wibox for each screen and add it
@@ -830,7 +891,7 @@ awful.screen.connect_for_each_screen(function(s)
     bot_layout:add(my_volume)
     bot_layout:add(kbdwidget)
     bot_layout:add(s.mylayoutbox)
-    bot_layout:add(mytextclock)
+    bot_layout:add(txtclock)
     
     local layout = wibox.layout.align.vertical()
     layout:set_top(top_layout)
