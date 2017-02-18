@@ -748,14 +748,19 @@ txtclock:setup {
     layout = wibox.layout.flex.horizontal
 }
 txtclock.top = 3
-awful.widget.watch('bash -c "khal at today"', 300, function(widget, stdout)
-    lines = {}
+local words = {"годовщина", "Годовщина", "ДР", "birthdays"}
+awful.widget.watch('khal list today --format "{calendar} {title}"', 300, function(widget, stdout)
     for line in stdout:gmatch("[^\r\n]+") do 
-        lines[#lines + 1] = line
+        for _, word in pairs(words) do
+            if string.find(line, word) then
+                txtclock.root.bgd:set_bg(theme.bg_urgent)
+                break
+            end
+        end
     end
 
 end)
-cal = lain.widget.calendar({attach_to = {mytextclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = naughty.config.presets.normal, icons = "/"})
+cal = lain.widget.calendar({attach_to = {txtclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = naughty.config.presets.normal, icons = "/"})
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
