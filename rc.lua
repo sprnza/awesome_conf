@@ -696,7 +696,7 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/local_status"', 300, function(w
     local five_min_load = string.match(lines[2], "^%d+.%d+, (%d+).%d+")
     if tonumber(five_min_load) >= 1 then
         avg_bg = "#FF0000"
-        srv_mon.root.bgd:set_bg(avg_bg)
+        srv_mon.root.bgd_loc:set_bg(avg_bg)
     end
     loc_tip:set_markup("This machine\n" .. lines[1].."<span background='"..avg_bg.."'>\nAverage load:\t\t" .. lines[2].. "</span><span background='"..temp_bg .. "'>\nTemperature:\t\t" .. lines[5] .. "</span><span background='".. hdd_bg .. "'>\nRoot/Home usage:\t" .. lines[4] .. "</span><span background='" .. upd_bg .. "'>\nUpdates pending:\t".. lines[3].."</span>")
 end)
