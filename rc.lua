@@ -518,7 +518,7 @@ btt = lain.widget.bat({
                 if fullscreenClient and redshift then
                     awful.util.spawn("redshift -x >/dev/null 2>&1")
                     redshift = false
-                elseif not fullscreenClient and not redshift then
+                elseif not fullscreenClient then
                     awful.util.spawn("redshift -o >/dev/null 2>&1")
                     redshift = true
                 end
