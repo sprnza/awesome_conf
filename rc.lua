@@ -640,8 +640,8 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(
     local hdd_bg = theme.bg_normal
     local upd_bg = theme.bg_normal
     local ram_bg = theme.bg_normal
-    local lines = {}
     srv_mon.root.bgd:set_bg(theme.bg_normal)
+    local lines = {}
     for line in stdout:gmatch("[^\r\n]+") do 
         lines[#lines + 1] = line
     end
