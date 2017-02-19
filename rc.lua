@@ -493,7 +493,7 @@ btt = lain.widget.bat({
                             loadstring(tabs)()
                         end})
                 end
-                local apps = {"Vlc", "Deadbeef"}
+                local apps = {"Vlc", "Deadbeef", "mpv"}
                 local roles = {"CallWindow"} --Skype's call window
                 local clients = client.get()
                 local i = 0
