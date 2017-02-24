@@ -208,6 +208,9 @@ elseif hostname == "laptop" then
     suspend = "enabled"
     --xset = true -- true=battery(180s), false=AC(300s) it's being set inside battery widget callback function
     lock = true -- 1=enabled, 0=disabled
+    elseif hostname == "acer" then
+	    DPMS=180
+	    suspend = "enabled"
 end
 run_once("xset s " .. DPMS)
 
