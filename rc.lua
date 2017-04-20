@@ -1042,7 +1042,7 @@ globalkeys = awful.util.table.join(
    awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end),
    awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Nusha")          end,
               {description = "launch Nusha's Firefox", group = "custom"}),
-   awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Sprnza")          end,
+   awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("firefox -P Sprnza")          end,
               {description = "launch Firefox", group = "custom"}),
    awful.key({ modkey, "Shift" }, "t",     translate,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
