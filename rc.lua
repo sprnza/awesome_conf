@@ -210,6 +210,9 @@ elseif hostname == "laptop" then
     suspend = "enabled"
     --xset = true -- true=battery(180s), false=AC(300s) it's being set inside battery widget callback function
     lock = true -- 1=enabled, 0=disabled
+    elseif hostname == "acer" then
+	    DPMS=180
+	    suspend = "enabled"
 end
 run_once("xset s " .. DPMS)
 
@@ -1047,7 +1050,7 @@ globalkeys = awful.util.table.join(
    awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end),
    awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Nusha")          end,
               {description = "launch Nusha's Firefox", group = "custom"}),
-   awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Sprnza")          end,
+   awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("firefox -P Sprnza")          end,
               {description = "launch Firefox", group = "custom"}),
    awful.key({ modkey, "Shift" }, "l",     function () awful.spawn("env GTK_THEME=Greybird luakit")          end,
               {description = "launch Firefox", group = "custom"}),
