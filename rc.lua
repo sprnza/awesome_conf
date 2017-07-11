@@ -340,7 +340,7 @@ kbdwidget.widget.align = "center"
 mailwidget = wibox.container.margin()
 
 mailwidget_buttons = awful.util.table.join(
-    awful.button({ }, 1, function () awful.spawn("geary") end)
+    awful.button({ }, 1, function () awful.spawn(terminal .. " -e mutt") end)
     )
 mailwidget:setup {
     {
@@ -370,14 +370,14 @@ mailwidgettimer:connect_signal("timeout",
         mailwidget.root.bgd:set_bg(theme.bg_urgent)
         mailwidget.root.bgd.text:set_text(pr_mail+wrk_mail)
         mailwidget_buttons = awful.util.table.join(
-            awful.button({ }, 1, function () awful.spawn("geary") end)
+            awful.button({ }, 1, function () awful.spawn(terminal .. " -e mutt") end)
             )
         mailwidget.root.bgd:buttons(mailwidget_buttons)
        else
         mailwidget.root.bgd:set_bg(theme.bg_normal)
         mailwidget.root.bgd.text:set_text("@")
         mailwidget_buttons = awful.util.table.join(
-            awful.button({ }, 1, function () awful.spawn("geary") end)
+            awful.button({ }, 1, function () awful.spawn(termnal .. " -e mutt") end)
             )
         mailwidget.root.bgd:buttons(mailwidget_buttons)
        end
