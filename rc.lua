@@ -16,7 +16,7 @@ local lain = require("lain")
 
 
 -- {{{ Notifications position and border width
-naughty.config.presets.normal.position = "bottom_left"
+naughty.config.presets.normal.position = "top_right"
 naughty.config.icon_dirs = {os.getenv("HOME") .. "/.config/awesome/themes/icons/"}
 naughty.config.icon_formats = {"png", "svg"}
 naughty.config.presets.normal.font = "Monospace Regular 11"
@@ -192,8 +192,10 @@ end
 --awful.util.spawn_with_shell("wmctrl -x -a conky || conky")
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
+run_once("nextcloud")
 run_once("kbdd")
 run_once("redshift -o")
+run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
 --run_once("xcompmgr")
 if hostname == "arch" then
@@ -472,8 +474,6 @@ tabs = {}
 fullscreenClient = false
 redshift = true
 btt = lain.widget.bat({
-        bat_notification_low_preset = naughty.config.presets.normal,
-        bat_notification_critical_preset = naughty.config.presets.critical,
         timeout = 60,
         settings=function()
             widget:set_text("⚕" .. bat_now.perc .. "%")
@@ -569,6 +569,8 @@ btt = lain.widget.bat({
                 end
 
             end
+            bat_notification_low_preset = {fg = "#ffffff",bg = "#ff0000", title = "Battery low", text = "Plug the cable!"}
+            bat_notification_critical_preset = {fg = "#202020",bg = "#CDCDCD", title = "Battery exhausted", text = "Shutdown imminent"}
     end
 })
 my_bat:setup {
@@ -614,6 +616,9 @@ systray.sstr:set_horizontal(false)
 if hostname == "arch" then
 	systray.left = 11
 	systray.right = 11
+elseif hostname == "laptop" then
+    systray.left = 10
+    systray.right = 10
 end
 -- Memory widget
 mmr = lain.widget.mem{
@@ -760,7 +765,7 @@ awful.widget.watch('khal list today --format "{calendar} {title}"', 300, functio
     end
 
 end)
-cal = lain.widget.calendar({attach_to = {txtclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = naughty.config.presets.normal, icons = "/"})
+cal = lain.widget.calendar({attach_to = {txtclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = {fg = "#999999",bg = "#222222", font = "Monospace Regular 11", position = "bottom_left"}, icons = "/"})
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
@@ -1044,6 +1049,8 @@ globalkeys = awful.util.table.join(
               {description = "launch Nusha's Firefox", group = "custom"}),
    awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Sprnza")          end,
               {description = "launch Firefox", group = "custom"}),
+   awful.key({ modkey, "Shift" }, "l",     function () awful.spawn("env GTK_THEME=Greybird luakit")          end,
+              {description = "launch Firefox", group = "custom"}),
    awful.key({ modkey, "Shift" }, "t",     translate,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
    awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
@@ -1203,6 +1210,8 @@ awful.rules.rules = {
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
      { rule = { class = "Firefox" },
+       properties = { screen = 1, tag = "➋" } },
+     { rule = { class = "Luakit" },
        properties = { screen = 1, tag = "➋" } },
      { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
        properties = { screen = 1, tag = "➌" } },
