@@ -202,6 +202,7 @@ if hostname == "arch" then
     DPMS=600
     run_once("numlockx on")
     run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
+    suspend = "enabled"
 elseif hostname == "laptop" then
 	run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
 	run_once("syndaemon -d -k -i 1")
@@ -462,7 +463,6 @@ my_volume:buttons(awful.util.table.join(
     awful.button({ }, 5, function () volume("-") end)
     ))
 -- Battery widget stuff
-if hostname ~= "arch" then
 my_bat = wibox.container.margin()
 my_bat.top = "3"
 my_bat_tip = awful.tooltip({ objects = {my_bat}})
@@ -480,7 +480,11 @@ redshift = true
 btt = lain.widget.bat({
         timeout = 60,
         settings=function()
+		if hostname ~= "arch" then
             widget:set_text("⚕" .. bat_now.perc .. "%")
+    		else
+            widget:set_text("⚕")
+	    	end	
             widget:set_align("center")
             triggerTab = false
             if suspend ~= "manually" then
@@ -607,7 +611,6 @@ my_bat:buttons(awful.util.table.join(
   end)
 ))
 
-end
 
 
 -- Systray widget
@@ -899,9 +902,7 @@ awful.screen.connect_for_each_screen(function(s)
     bot_layout:add(srv_mon)
     bot_layout:add(my_mem)
     bot_layout:add(mailwidget)
-    if hostname ~= "arch" then
     bot_layout:add(my_bat)
-    end
     bot_layout:add(my_volume)
     bot_layout:add(kbdwidget)
     bot_layout:add(s.mylayoutbox)
