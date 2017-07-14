@@ -204,8 +204,8 @@ if hostname == "arch" then
     run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
     suspend = "enabled"
 elseif hostname == "laptop" then
-	run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
-	run_once("syndaemon -d -k -i 1")
+    run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
+    run_once("syndaemon -d -k -i 1")
     run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
     DPMS=180
     suspend = "enabled"
@@ -483,6 +483,7 @@ btt = lain.widget.bat({
 		if hostname ~= "arch" then
             widget:set_text("⚕" .. bat_now.perc .. "%")
     		else
+			bat_now.ac_status = 0
             widget:set_text("⚕")
 	    	end	
             widget:set_align("center")
