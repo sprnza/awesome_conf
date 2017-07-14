@@ -474,6 +474,7 @@ DPMS = 0
 sleep = 0
 check_tabs = {"youtube.com"}
 tabs = {}
+luakit_yt = false
 fullscreenClient = false
 redshift = true
 btt = lain.widget.bat({
@@ -532,13 +533,13 @@ btt = lain.widget.bat({
                         end
                     end
                 end
-                if i > 0 or triggerTab and suspend == "enabled" then
+                if i > 0 or triggerTab or luakit_yt and suspend == "enabled" then
                     awful.spawn("xautolock -disable")
                     awful.spawn("xset s off")
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
-                elseif i == 0 and not triggerTab and suspend == "disabled" then
+                elseif i == 0 and not triggerTab and not luakit_yt and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
                     awful.spawn("xset s " .. DPMS)
                     suspend = "enabled"
@@ -1052,8 +1053,12 @@ globalkeys = awful.util.table.join(
               {description = "launch Nusha's Firefox", group = "custom"}),
    awful.key({ modkey, "Shift" }, "f",     function () awful.spawn("firefox -P Sprnza")          end,
               {description = "launch Firefox", group = "custom"}),
-   awful.key({ modkey, "Shift" }, "l",     function () awful.spawn("env GTK_THEME=Greybird luakit")          end,
+   awful.key({ modkey, "Control" }, "l",     function () awful.spawn("env GTK_THEME=Greybird luakit")          end,
               {description = "launch Firefox", group = "custom"}),
+   awful.key({ modkey, "Control" }, "m",     function () awful.spawn(terminal .. " -e mutt")          end,
+              {description = "launch Mutt", group = "custom"}),
+   awful.key({ modkey, "Control" }, "w",     function () awful.spawn(terminal .. " -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'")          end,
+              {description = "launch Mutt", group = "custom"}),
    awful.key({ modkey, "Shift" }, "t",     translate,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
    awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
