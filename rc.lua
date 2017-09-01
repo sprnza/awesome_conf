@@ -193,9 +193,9 @@ end
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 run_once("nextcloud")
-run_once("xxkb")
-run_once("redshift -o")
-run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
+--run_once("xxkb")
+--run_once("redshift -o")
+--run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
 --run_once("xcompmgr")
 if hostname == "arch" then
@@ -307,16 +307,22 @@ powerMenu = {
 internetMenu = {
     { "Firefox Nusha", "env GTK_THEME=Greybird firefox" },
     { "Skype", "skype" },
-    { "Luakit", "luakit" },
     { "Telegram", "telegram-desktop" },
-    { "Geary", "geary"}
+    { "Mutt", terminal .. " -e mutt"},
+    { "Weechat", terminal .. " -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'"},
 }
 
+toolsMenu = {
+    { "Calculator", "speedcrunch" },
+    { "TodoMachine", terminal .. " -e todotxt-machine" },
+    { "QOwnNotes", "QOwnNotes" },
+    }
 
-mymainmenu = awful.menu({ items = { { "Internet", internetMenu },
+mymainmenu = awful.menu({ items = { 
                                     { "Files", "thunar" },
+                                    { "Tools", toolsMenu },
+                                    { "Internet", internetMenu },
                                     { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal },
                                     { "Power", powerMenu },
                                   }
                         })
@@ -869,7 +875,7 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    mytag = awful.tag({"➊", "➋", "➌", "➍"}, s, awful.layout.layouts[2])
+    mytag = awful.tag({"1", "2", "3", "4"}, s, awful.layout.layouts[1])
 --   mytag.incnmaster(2)
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -1060,7 +1066,9 @@ globalkeys = awful.util.table.join(
    awful.key({ modkey, "Control" }, "m",     function () awful.spawn(terminal .. " -e mutt")          end,
               {description = "launch Mutt", group = "custom"}),
    awful.key({ modkey, "Control" }, "w",     function () awful.spawn(terminal .. " -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'")          end,
-              {description = "launch Mutt", group = "custom"}),
+              {description = "attach to Weechat", group = "custom"}),
+   awful.key({ modkey, "Control" }, "x",     function () awful.spawn(terminal .. " -hold -e \"xprop | grep -i class\"")          end,
+              {description = "Get window.Class property", group = "custom"}),
    awful.key({ modkey, "Shift" }, "t",     translate,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
    awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
@@ -1220,13 +1228,19 @@ awful.rules.rules = {
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
      { rule = { class = "Firefox" },
-       properties = { screen = 1, tag = "➋" } },
+       properties = { screen = 1, tag = "2", maximized = true} },
+     { rule = { name = "Keyboard" },
+       properties = { focusable = false, ontop = true } },
+     { rule = { class = "XTerm" },
+       properties = { screen = 1, tag = "1" } },
      { rule = { class = "Luakit" },
-       properties = { screen = 1, tag = "➋" } },
+       properties = { screen = 1, tag = "2" } },
      { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
-       properties = { screen = 1, tag = "➌" } },
+       properties = { screen = 1, tag = "3" } },
+     { rule_any = { class = "QOwnNotes" },
+       properties = { screen =1, tag = "3" } },
      { rule_any = { class = { "Geary", "TelegramDesktop" } },
-       properties = { screen = 1, tag = "➍", callback =  function()
+       properties = { screen = 1, tag = "4", callback =  function()
                         if not awesome.startup then    
                             local screen = awful.screen.focused()
                             local tag = screen.tags[4]
@@ -1251,13 +1265,13 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
-    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "➊"):clients()[3].floating ~= true  then
+    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "1"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "1"):clients()[3].floating ~= true  then
         awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
         master_increased = true
     end
 end)
 client.connect_signal("unmanage", function (c)
-    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "➊"):clients() == 2 and master_increased then
+    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "1"):clients() == 2 and master_increased then
         awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
         master_increased = false
     end
@@ -1276,14 +1290,14 @@ client.connect_signal("request::titlebars", function(c)
             )
 
     -- Minimize, Maximize, Close buttons
-    local right_layout = wibox.layout.flex.horizontal()
+    local right_layout = wibox.layout.fixed.horizontal()
     right_layout:add(awful.titlebar.widget.minimizebutton(c))
     right_layout:add(awful.titlebar.widget.maximizedbutton(c))
     right_layout:add(awful.titlebar.widget.closebutton(c))
-    right_layout.forced_width=150
+    --right_layout.forced_width=150
 
     -- Dragable titlebar
-    local middle_layout = wibox.layout.flex.horizontal()
+    local middle_layout = wibox.layout.fixed.horizontal()
     middle_layout:buttons(buttons)
 
     -- Now bring it all together
@@ -1291,17 +1305,17 @@ client.connect_signal("request::titlebars", function(c)
     layout:set_right(right_layout)
     layout:set_middle(middle_layout)
 
-    awful.titlebar(c,{size=7}):set_widget(layout) 
+    awful.titlebar(c,{size=15}):set_widget(layout) 
     awful.titlebar.show(c)
 end)
 
 -- Enable sloppy focus, so that focus follows mouse.
-client.connect_signal("mouse::enter", function(c)
-    if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-        and awful.client.focus.filter(c) then
-        client.focus = c
-    end
-end)
+--client.connect_signal("mouse::enter", function(c)
+--    if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+--        and awful.client.focus.filter(c) then
+--        client.focus = c
+--    end
+--end)
 
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
@@ -1314,16 +1328,22 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
 
         if #clients > 0 then -- Fine grained borders and floaters control
             for _, c in pairs(clients) do -- Floaters always have borders
-				if (c.maximized_horizontal == true and c.maximized_vertical == true) then
-					c.border_width = 0
-                else
-					c.border_width = beautiful.border_width
-                end
                 if layout == "tile" then
 					awful.titlebar.hide(c)
 				else
 					awful.titlebar.show(c)
 				end
+				if (c.maximized == true) then
+					c.border_width = 0
+                    if c.class == "Firefox" then
+                        awful.titlebar.hide(c)
+                    end
+                else
+                    if c.class == "Firefox" then
+                        awful.titlebar.show(c)
+                    end
+					c.border_width = beautiful.border_width
+                end
             end
         end
       end)

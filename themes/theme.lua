@@ -38,19 +38,25 @@ theme.menu_width                    = "150"
 -- icon used when a client has no default
 theme.generic_icon = "/usr/share/icons/Menda-Circle/apps/48x48/apps/utilities-terminal.svg"
 -- titlebar buttons
-theme.tb_button                    = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_button.png"
-theme.tb_close_button                    = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_button.png"
-theme.tb_color                     = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_color.png"
-theme.titlebar_close_button_normal = theme.tb_color
-theme.titlebar_close_button_focus  = theme.tb_close_button
-theme.titlebar_maximized_button_normal_inactive = theme.tb_color
-theme.titlebar_maximized_button_focus_inactive = theme.tb_button
-theme.titlebar_maximized_button_normal_active = theme.tb_color
-theme.titlebar_maximized_button_focus_active = theme.tb_button
-theme.titlebar_minimize_button_normal_inactive = theme.tb_color
-theme.titlebar_minimize_button_focus_inactive = theme.tb_button
-theme.titlebar_minimize_button_normal_active = theme.tb_color
-theme.titlebar_minimize_button_focus_active = theme.tb_button
+theme.tb_close_active              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_active.png"
+theme.tb_close_inactive              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_inactive.png"
+theme.tb_hide_active              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_hide_active.png"
+theme.tb_hide_inactive              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_hid_inactive.png"
+theme.tb_max_active              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_max_active.png"
+theme.tb_max_inactive              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_max_inactive.png"
+theme.titlebar_close_button_normal = theme.tb_close_inactive
+theme.titlebar_close_button_focus  = theme.tb_close_active
+theme.titlebar_maximized_button_normal_inactive = theme.tb_max_inactive
+theme.titlebar_maximized_button_focus_inactive = theme.tb_max_active
+theme.titlebar_maximized_button_normal_active = theme.tb_max_inactive
+theme.titlebar_maximized_button_focus_active = theme.tb_max_active
+theme.titlebar_minimize_button_normal_inactive = theme.tb_hide_inactive
+theme.titlebar_minimize_button_focus_inactive = theme.tb_hide_active
+theme.titlebar_minimize_button_normal_active = theme.tb_hide_inactive
+theme.titlebar_minimize_button_focus_active = theme.tb_hide_active
+
+theme.titlebar_bg_normal = "#2F343F"
+theme.titlebar_bg = "#2F343F"
 
 -- layout images
 theme.icon_dir                      = "/usr/share/awesome/themes/default/layouts"
