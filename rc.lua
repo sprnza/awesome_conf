@@ -413,7 +413,7 @@ mailwidgettimer:start()
 
 weather_widget = wibox.container.margin()
 weather_buttons = awful.util.table.join(
-    awful.button({ }, 1, function () awful.spawn(terminal .. " -hold -maximized -e curl http://wttr.in/moscow") end)
+    awful.button({ }, 1, function () awful.spawn(terminal .. " -hold -e curl http://wttr.in/moscow") end)
     )
 w, t, h, wd, ws = getweather()
 weather_widget:setup {
@@ -1273,6 +1273,8 @@ awful.rules.rules = {
        properties = { screen = 1, tag = "2", maximized = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
+     { rule = { name = "curl" },
+       properties = { maximized = true } },
      { rule = { class = "XTerm" },
        properties = { screen = 1, tag = "1" } },
      { rule = { class = "Luakit" },
