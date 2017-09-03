@@ -1273,6 +1273,8 @@ awful.rules.rules = {
        properties = { screen = 1, tag = "2", maximized = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
+     { rule = { name = "curl" },
+       properties = { maximized = true } },
      { rule = { class = "XTerm" },
        properties = { screen = 1, tag = "1" } },
      { rule = { class = "Luakit" },
