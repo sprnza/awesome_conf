@@ -14,6 +14,9 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 local common = require("awful.widget.common")
 local lain = require("lain")
 
+-- Custom libraries
+local weather = require("weather")
+
 
 -- {{{ Notifications position and border width
 naughty.config.presets.normal.position = "top_right"
@@ -195,9 +198,9 @@ run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps
 run_once("nextcloud")
 --run_once("xxkb")
 --run_once("redshift -o")
---run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
+run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
---run_once("xcompmgr")
+run_once("xcompmgr")
 if hostname == "arch" then
     DPMS=600
     run_once("numlockx on")
@@ -318,9 +321,15 @@ toolsMenu = {
     { "QOwnNotes", "QOwnNotes" },
     }
 
+officeMenu = {
+    { "Writer", "libreoffice --writer"},
+    { "Calc", "libreoffice --calc"},
+}
+
 mymainmenu = awful.menu({ items = { 
                                     { "Files", "thunar" },
                                     { "Tools", toolsMenu },
+                                    { "Office", officeMenu },
                                     { "Internet", internetMenu },
                                     { "awesome", myawesomemenu, beautiful.awesome_icon },
                                     { "Power", powerMenu },
@@ -400,6 +409,38 @@ mailwidgettimer:connect_signal("timeout",
     end
 )
 mailwidgettimer:start()
+-- Weather widget
+
+weather_widget = wibox.container.margin()
+weather_buttons = awful.util.table.join(
+    awful.button({ }, 1, function () awful.spawn(terminal .. " -hold -maximized -e curl http://wttr.in/moscow") end)
+    )
+w, t, h, wd, ws = getweather()
+weather_widget:setup {
+    {
+        {
+            id = "text",
+            text = t.."°C",
+            align = "center",
+            widget = wibox.widget.textbox
+        },
+        id = "bgd",
+        buttons = weather_buttons,
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.fixed.vertical
+}
+weather_widget.top = 3
+weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
+weatherwidgettimer = gears.timer({ timeout = 3600 })
+weather_widget_tip:set_text("WEATHER\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. "/" .. ws)
+weatherwidgettimer:connect_signal("timeout",
+    function()
+        w, t, h, wd, ws = getweather()
+    end
+)
+weatherwidgettimer:start()
 
 -- Volume widget stuff
 step = 3 -- is used in key bindings on order to notify properly
@@ -910,6 +951,7 @@ awful.screen.connect_for_each_screen(function(s)
     bot_layout:add(my_mem)
     bot_layout:add(mailwidget)
     bot_layout:add(my_bat)
+    bot_layout:add(weather_widget)
     bot_layout:add(my_volume)
     bot_layout:add(kbdwidget)
     bot_layout:add(s.mylayoutbox)
