@@ -1274,15 +1274,15 @@ awful.rules.rules = {
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
      { rule = { class = "Firefox" },
-       properties = { screen = 1, tag = "2", maximized = true} },
+       properties = { screen = 1, tag = "1", maximized = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
      { rule = { class = "CURL" },
        properties = { maximized = true } },
      { rule = { class = "XTerm" },
-       properties = { screen = 1, tag = "1" } },
-     { rule = { class = "Luakit" },
        properties = { screen = 1, tag = "2" } },
+     { rule = { class = "Luakit" },
+       properties = { screen = 1, tag = "1" } },
      { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
        properties = { screen = 1, tag = "3" } },
      { rule_any = { class = "QOwnNotes" },
@@ -1313,7 +1313,7 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
-    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "1"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "1"):clients()[3].floating ~= true  then
+    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "2"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "2"):clients()[3].floating ~= true  then
         awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
         master_increased = true
     end
