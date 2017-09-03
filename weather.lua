@@ -68,5 +68,17 @@ function getweather()
     wind_direction=w_page[1][20][1]
     wind_speed_m=w_page [1][22][1]
 
-    return weather, temp, humidity, wind_direction, wind_speed_m
+    if string.match(string.lower(weather), "rain") then
+        icon = "⛆"
+    elseif string.match(string.lower(weather), "storm") then
+        icon = "⛈"
+    elseif string.match(string.lower(weather), "cloud") then
+        icon = "⛅"
+    elseif string.match(string.lower(weather), "clear") then
+        icon = "☼"
+    elseif string.match(string.lower(weather), "snow") then
+        icon = "⛄"
+    end
+
+    return icon, weather, temp, humidity, wind_direction, wind_speed_m
 end

@@ -197,10 +197,11 @@ end
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 run_once("nextcloud")
 --run_once("xxkb")
---run_once("redshift -o")
+run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
 run_once("xcompmgr")
+run_once("/home/speranza/.hud/hud-menu-service.py")
 if hostname == "arch" then
     DPMS=600
     run_once("numlockx on")
@@ -413,14 +414,14 @@ mailwidgettimer:start()
 
 weather_widget = wibox.container.margin()
 weather_buttons = awful.util.table.join(
-    awful.button({ }, 1, function () awful.spawn(terminal .. " -hold -e curl http://wttr.in/moscow") end)
+    awful.button({ }, 1, function () awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/moscow") end)
     )
-w, t, h, wd, ws = getweather()
+i, w, t, h, wd, ws = getweather()
 weather_widget:setup {
     {
         {
             id = "text",
-            text = t.."°C",
+            text = i..t.."°C",
             align = "center",
             widget = wibox.widget.textbox
         },
@@ -437,7 +438,7 @@ weatherwidgettimer = gears.timer({ timeout = 3600 })
 weather_widget_tip:set_text("WEATHER\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. "/" .. ws)
 weatherwidgettimer:connect_signal("timeout",
     function()
-        w, t, h, wd, ws = getweather()
+        i, w, t, h, wd, ws = getweather()
     end
 )
 weatherwidgettimer:start()
@@ -528,7 +529,8 @@ btt = lain.widget.bat({
         timeout = 60,
         settings=function()
 		if hostname ~= "arch" then
-            widget:set_text("⚕" .. bat_now.perc .. "%")
+            --widget:set_text("⚕" .. bat_now.perc .. "%")
+            widget:set_text("⛽" .. bat_now.perc .. "%")
     		else
 			bat_now.ac_status = 0
             widget:set_text("⚕")
@@ -1122,7 +1124,9 @@ globalkeys = awful.util.table.join(
    awful.key({"Control" }, "Print",     function () awful.spawn("xfce4-screenshooter -r") end,
               {description = "Take a screenshot ot the selected region", group = "custom"}),
    awful.key({"Mod1" }, "Print",     function () awful.spawn("xfce4-screenshooter -w") end,
-              {description = "Take a screenshot ot the active window", group = "custom"})
+              {description = "Take a screenshot ot the active window", group = "custom"}),
+   awful.key({"Mod1" }, "m",     function () awful.spawn(os.getenv("HOME").."/.hud/hud-menu.py") end,
+              {description = "Show a HUD menu", group = "custom"})
 )
 
 clientkeys = awful.util.table.join(
@@ -1273,7 +1277,7 @@ awful.rules.rules = {
        properties = { screen = 1, tag = "2", maximized = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
-     { rule = { name = "curl" },
+     { rule = { class = "CURL" },
        properties = { maximized = true } },
      { rule = { class = "XTerm" },
        properties = { screen = 1, tag = "1" } },
