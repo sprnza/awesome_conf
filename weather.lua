@@ -69,7 +69,7 @@ function getweather()
     wind_speed_m=w_page [1][22][1]/2.2369362920544
     city=w_page[1][5][2][1]
     upd=os.date("*t", w_page[1][10][1])
-    updated=upd.day.."."..upd.month.."."..upd.year.." "..upd.hour..":"..upd.min
+    updated=string.format("%02.0f", upd.day).."."..string.format("%02.0f", upd.month).."."..upd.year.." "..string.format("%02.0f", upd.hour)..":"..string.format("%02.0f", upd.min)
 
     if string.match(string.lower(weather), "rain") then
         icon = "⛆"

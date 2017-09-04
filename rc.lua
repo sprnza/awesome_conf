@@ -310,6 +310,7 @@ powerMenu = {
 }
 internetMenu = {
     { "Firefox Nusha", "env GTK_THEME=Greybird firefox" },
+    { "Transmission", "transmission-remote-gtk"},
     { "Skype", "skype" },
     { "Telegram", "telegram-desktop" },
     { "Mutt", terminal .. " -e mutt"},
@@ -410,13 +411,13 @@ mailwidgettimer:start()
 -- Weather widget
 
 weather_widget = wibox.container.margin()
+i, w, t, h, wd, ws, c, u = getweather()
 weather_buttons = awful.util.table.join(
     awful.button({ }, 1, function () 
         i, w, t, h, wd, ws, c, u = getweather()
         awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
     end)
     )
-i, w, t, h, wd, ws, c, u = getweather()
 weather_widget:setup {
     {
         {
@@ -435,7 +436,7 @@ weather_widget:setup {
 weather_widget.top = 3
 weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
 weatherwidgettimer = gears.timer({ timeout = 3600 })
-weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. "/" .. ws.."m/s\nUpdated:\t"..u)
+weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
 weatherwidgettimer:connect_signal("timeout",
     function()
         i, w, t, h, wd, ws, c, u = getweather()
