@@ -66,7 +66,10 @@ function getweather()
     temp=w_page[1][17][1]
     humidity=w_page[1][18][1]
     wind_direction=w_page[1][20][1]
-    wind_speed_m=w_page [1][22][1]
+    wind_speed_m=w_page [1][22][1]/2.2369362920544
+    city=w_page[1][5][2][1]
+    upd=os.date("*t", w_page[1][10][1])
+    updated=upd.day.."."..upd.month.."."..upd.year.." "..upd.hour..":"..upd.min
 
     if string.match(string.lower(weather), "rain") then
         icon = "⛆"
@@ -80,5 +83,5 @@ function getweather()
         icon = "⛄"
     end
 
-    return icon, weather, temp, humidity, wind_direction, wind_speed_m
+    return icon, weather, temp, humidity, wind_direction, string.format("%.2f", wind_speed_m), city, updated
 end

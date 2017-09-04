@@ -337,9 +337,6 @@ mymainmenu = awful.menu({ items = {
                                   }
                         })
 
-mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
-                                     menu = mymainmenu })
-
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
 --app_folders = { "/usr/share/applications/", "~/.local/share/applications/" }
@@ -414,9 +411,12 @@ mailwidgettimer:start()
 
 weather_widget = wibox.container.margin()
 weather_buttons = awful.util.table.join(
-    awful.button({ }, 1, function () awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/moscow") end)
+    awful.button({ }, 1, function () 
+        i, w, t, h, wd, ws, c, u = getweather()
+        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
+    end)
     )
-i, w, t, h, wd, ws = getweather()
+i, w, t, h, wd, ws, c, u = getweather()
 weather_widget:setup {
     {
         {
@@ -435,10 +435,10 @@ weather_widget:setup {
 weather_widget.top = 3
 weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
 weatherwidgettimer = gears.timer({ timeout = 3600 })
-weather_widget_tip:set_text("WEATHER\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. "/" .. ws)
+weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. "/" .. ws.."m/s\nUpdated:\t"..u)
 weatherwidgettimer:connect_signal("timeout",
     function()
-        i, w, t, h, wd, ws = getweather()
+        i, w, t, h, wd, ws, c, u = getweather()
     end
 )
 weatherwidgettimer:start()
@@ -1314,13 +1314,13 @@ client.connect_signal("manage", function (c)
         awful.placement.no_offscreen(c)
     end
     if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "2"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "2"):clients()[3].floating ~= true  then
-        awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
+        awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "2"))
         master_increased = true
     end
 end)
 client.connect_signal("unmanage", function (c)
-    if awful.screen.focused().selected_tag.index == 1 and #awful.tag.find_by_name(awful.screen.focused(), "1"):clients() == 2 and master_increased then
-        awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "➊"))
+    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "2"):clients() == 2 and master_increased then
+        awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "2"))
         master_increased = false
     end
 end)

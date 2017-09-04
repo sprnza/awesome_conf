@@ -37,6 +37,7 @@ theme.bg_systray                    = theme.color_light
 theme.menu_width                    = "150"
 -- icon used when a client has no default
 theme.generic_icon = "/usr/share/icons/Menda-Circle/apps/48x48/apps/utilities-terminal.svg"
+theme.ff_icon = "/usr/share/icons/Menda-Circle/apps/48x48/apps/firefox-original.svg"
 -- titlebar buttons
 theme.tb_close_active              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_active.png"
 theme.tb_close_inactive              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_inactive.png"
