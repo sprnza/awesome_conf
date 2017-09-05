@@ -315,7 +315,7 @@ internetMenu = {
     { "Skype", "skype" },
     { "Telegram", "telegram-desktop" },
     { "Mutt", terminal .. " -e mutt"},
-    { "Weechat", terminal .. " -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'"},
+    { "Weechat", terminal .. " -class WEECHAT -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'"},
 }
 
 toolsMenu = {
@@ -1121,7 +1121,7 @@ globalkeys = awful.util.table.join(
               {description = "launch Firefox", group = "custom"}),
    awful.key({ modkey, "Control" }, "m",     function () awful.spawn(terminal .. " -e mutt")          end,
               {description = "launch Mutt", group = "custom"}),
-   awful.key({ modkey, "Control" }, "w",     function () awful.spawn(terminal .. " -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'")          end,
+   awful.key({ modkey, "Control" }, "w",     function () awful.spawn(terminal .. " -class WEECHAT -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'")          end,
               {description = "attach to Weechat", group = "custom"}),
    awful.key({ modkey, "Control" }, "x",     function () awful.spawn(terminal .. " -hold -e \"xprop | grep -i class\"")          end,
               {description = "Get window.Class property", group = "custom"}),
@@ -1299,7 +1299,7 @@ awful.rules.rules = {
        properties = { screen = 1, tag = "3" } },
      { rule_any = { class = "QOwnNotes" },
        properties = { screen =1, tag = "3" } },
-     { rule_any = { class = { "Geary", "TelegramDesktop" } },
+     { rule_any = { class = { "Geary", "TelegramDesktop", "WEECHAT" } },
        properties = { screen = 1, tag = "4", callback =  function()
                         if not awesome.startup then    
                             local screen = awful.screen.focused()
