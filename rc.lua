@@ -202,7 +202,7 @@ run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
 run_once("xcompmgr")
-run_once("/home/speranza/.hud/hud-menu-service.py")
+--run_once("/home/speranza/.hud/hud-menu-service.py")
 if hostname == "arch" then
     DPMS=600
     run_once("numlockx on")
