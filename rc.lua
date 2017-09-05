@@ -534,10 +534,13 @@ btt = lain.widget.bat({
         settings=function()
 		if hostname ~= "arch" then
             --widget:set_text("⚕" .. bat_now.perc .. "%")
-            widget:set_text("⛽" .. bat_now.perc .. "%")
+            		widget:set_text("⛽" .. bat_now.perc .. "%")
+	    		if bat_now.perc == 100 then
+            			widget:set_text("⛽" .. " F")
+			end
     		else
 			bat_now.ac_status = 0
-            widget:set_text("⚕")
+			widget:set_text("⚕")
 	    	end	
             widget:set_align("center")
             triggerTab = false
@@ -922,7 +925,12 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    mytag = awful.tag({"1", "2", "3", "4"}, s, awful.layout.layouts[1])
+    if hostname == "acer" or hostname == "arch" then
+	    tag_layout = awful.layout.layouts[2] --tile
+    else
+	    tag_layout = awful.layout.layouts[1] --float
+    end
+    mytag = awful.tag({"1", "2", "3", "4"}, s, tag_layout)
 --   mytag.incnmaster(2)
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -1277,7 +1285,7 @@ awful.rules.rules = {
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
-     { rule = { class = "Firefox" },
+     { rule = { class = "Firefox", class = "Luakit"},
        properties = { screen = 1, tag = "1", maximized = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
@@ -1285,8 +1293,8 @@ awful.rules.rules = {
        properties = { maximized = true } },
      { rule = { class = "XTerm" },
        properties = { screen = 1, tag = "2" } },
-     { rule = { class = "Luakit" },
-       properties = { screen = 1, tag = "1" } },
+     --{ rule = { class = "Luakit" },
+     --  properties = { screen = 1, tag = "1" } },
      { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
        properties = { screen = 1, tag = "3" } },
      { rule_any = { class = "QOwnNotes" },
