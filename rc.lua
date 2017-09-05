@@ -1285,7 +1285,7 @@ awful.rules.rules = {
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
-     { rule = { class = "Firefox", class = "Luakit"},
+     { rule_any = { class = "Firefox", "Luakit"}, except = { instance = "JavaScript"},
        properties = { screen = 1, tag = "1", maximized = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
