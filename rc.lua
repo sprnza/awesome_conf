@@ -329,12 +329,18 @@ officeMenu = {
     { "Calc", "libreoffice --calc"},
 }
 
+workMenu = {
+    { "DBeaver", "dbeaver"},
+    { "Cutecom", "cutecom"},
+}
+
 mymainmenu = awful.menu({ items = { 
                                     { "Files", "thunar" },
                                     { "Tools", toolsMenu },
                                     { "Office", officeMenu },
                                     { "Internet", internetMenu },
-                                    { "awesome", myawesomemenu, beautiful.awesome_icon },
+                                    { "Work", workMenu },
+                                    { "Awesome", myawesomemenu, beautiful.awesome_icon },
                                     { "Power", powerMenu },
                                   }
                         })
@@ -1123,7 +1129,7 @@ globalkeys = awful.util.table.join(
               {description = "launch Mutt", group = "custom"}),
    awful.key({ modkey, "Control" }, "w",     function () awful.spawn(terminal .. " -class WEECHAT -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'")          end,
               {description = "attach to Weechat", group = "custom"}),
-   awful.key({ modkey, "Control" }, "x",     function () awful.spawn(terminal .. " -hold -e \"xprop | grep -i class\"")          end,
+   awful.key({ modkey, "Control" }, "x",     function () awful.spawn(terminal .. " -hold -e \"xprop\"")          end,
               {description = "Get window.Class property", group = "custom"}),
    awful.key({ modkey, "Shift" }, "t",     translate,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
@@ -1284,8 +1290,9 @@ awful.rules.rules = {
       }, properties = { titlebars_enabled = true }
     },
 
-    -- Set Firefox to always map on the tag named "2" on screen 1.
-     { rule_any = { class = "Firefox", "Luakit"}, except = { instance = "JavaScript"},
+    -- Set Firefox to always map on the tag named "1" on screen 1.
+     { rule_any = { class = {"Firefox", "Luakit"}},
+       except = { type = "dialog"},
        properties = { screen = 1, tag = "1", maximized = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
@@ -1300,7 +1307,7 @@ awful.rules.rules = {
      { rule_any = { class = "QOwnNotes" },
        properties = { screen =1, tag = "3" } },
      { rule_any = { class = { "Geary", "TelegramDesktop", "WEECHAT" } },
-       properties = { screen = 1, tag = "4", callback =  function()
+       properties = { screen = 1, tag = "4",  callback =  function()
                         if not awesome.startup then    
                             local screen = awful.screen.focused()
                             local tag = screen.tags[4]
