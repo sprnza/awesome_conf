@@ -24,4 +24,7 @@ mon)
     echo "" >> $output
     sensors|awk '/^Core 0/{print $3}' >>$output
     ;;
+vpn)
+    ifconfig|grep -q "ppp0" && echo 1 || echo 0
+    ;;
 esac

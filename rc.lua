@@ -453,6 +453,46 @@ weatherwidgettimer:connect_signal("timeout",
 )
 weatherwidgettimer:start()
 
+--- VPN widget
+vpn_widget = wibox.container.margin()
+vpn_buttons = awful.util.table.join(
+    awful.button({ }, 1, function () 
+        awful.spawn("networkmanager_dmenu")
+    end)
+    )
+vpn_widget:setup {
+    {
+        {
+            id = "text",
+            text = "VPN",
+            align = "center",
+            widget = wibox.widget.textbox
+        },
+        id = "bgd",
+        buttons = vpn_buttons,
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.fixed.vertical
+}
+vpn_widget.top = 3
+vpn_widget.visible = false
+vpnwidgettimer = gears.timer({ timeout = 10 })
+vpnwidgettimer:connect_signal("timeout",
+    function()
+       awful.spawn.with_line_callback(os.getenv("HOME").."/.config/awesome/bin/helpers.sh vpn", {
+           stdout = function(line)
+               vpn = line
+           end})
+       if vpn == "1" then
+            vpn_widget.visible = true
+       else
+            vpn_widget.visible = false
+       end
+    end
+)
+vpnwidgettimer:start()
+
 -- Volume widget stuff
 step = 3 -- is used in key bindings on order to notify properly
 function volume(action)
@@ -706,7 +746,7 @@ my_mem = wibox.container.margin(
         align = "center",
         widget = mmr.widget
 })
-my_mem.top = 3
+my_mem.top = 0
 
 -- Server monitoring widget
 awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(widget, stdout)
@@ -968,6 +1008,7 @@ awful.screen.connect_for_each_screen(function(s)
     --bot_layout:add(wibox.widget.systray)
     bot_layout:add(systray)
     bot_layout:add(srv_mon)
+    bot_layout:add(vpn_widget)
     bot_layout:add(my_mem)
     bot_layout:add(mailwidget)
     bot_layout:add(my_bat)
@@ -1028,8 +1069,8 @@ globalkeys = awful.util.table.join(
               {description = "swap with previous client by index", group = "client"}),
     awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end,
               {description = "focus the next screen", group = "screen"}),
-    awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end,
-              {description = "focus the previous screen", group = "screen"}),
+--    awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end,
+--              {description = "focus the previous screen", group = "screen"}),
     awful.key({ modkey,           }, "u", awful.client.urgent.jumpto,
               {description = "jump to urgent client", group = "client"}),
     awful.key({ modkey,           }, "Tab",
@@ -1144,7 +1185,9 @@ globalkeys = awful.util.table.join(
    awful.key({"Mod1" }, "Print",     function () awful.spawn("xfce4-screenshooter -w") end,
               {description = "Take a screenshot ot the active window", group = "custom"}),
    awful.key({"Mod1" }, "m",     function () awful.spawn(os.getenv("HOME").."/.hud/hud-menu.py") end,
-              {description = "Show a HUD menu", group = "custom"})
+              {description = "Show a HUD menu", group = "custom"}),
+   awful.key({ modkey, "Control" }, "n",     function () awful.spawn("networkmanager_dmenu") end,
+              {description = "Launch networkmanager-dmenu", group = "custom"})
 )
 
 clientkeys = awful.util.table.join(
