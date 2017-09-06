@@ -81,6 +81,8 @@ function getweather()
         icon = "☼"
     elseif string.match(string.lower(weather), "snow") then
         icon = "⛄"
+    else
+	icon = ""
     end
 
     return icon, weather, temp, humidity, wind_direction, string.format("%.2f", wind_speed_m), city, updated
