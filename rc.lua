@@ -492,6 +492,55 @@ vpnwidgettimer:connect_signal("timeout",
     end
 )
 vpnwidgettimer:start()
+-- Background processes
+bg_widget = wibox.container.margin()
+bgds = {}
+bg_buttons = awful.util.table.join(
+    awful.button({ }, 1, function () 
+        awful.menu(bgds):show()
+    end)
+    )
+bg_widget:setup {
+    {
+        {
+            id = "text",
+            text = "BGND",
+            align = "center",
+            widget = wibox.widget.textbox
+        },
+        id = "bgd",
+        buttons = bg_buttons,
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.fixed.vertical
+}
+bg_widget.top = 3
+bg_widget.visible = false
+bg_widgettimer = gears.timer({ timeout = 10 })
+bg_widgettimer:connect_signal("timeout",
+    function()
+       awful.spawn.with_line_callback(os.getenv("HOME").."/.config/awesome/bin/helpers.sh bgd", {
+           stdout = function(line)
+                procs = {}
+                table.insert(procs, line)
+           end})
+        if next(procs) ~= nil then
+            for i, c in pairs(procs) do
+               bgds[i] =
+                 {"Kill "..c,
+                  function()
+                     awful.util.spawn("pkill "..c)
+                  end
+                 }
+            end
+            bg_widget.visible = true
+        else
+            bg_widget.visible = false
+        end
+    end
+)
+bg_widgettimer:start()
 
 -- Volume widget stuff
 step = 3 -- is used in key bindings on order to notify properly
@@ -1008,6 +1057,7 @@ awful.screen.connect_for_each_screen(function(s)
     --bot_layout:add(wibox.widget.systray)
     bot_layout:add(systray)
     bot_layout:add(srv_mon)
+    bot_layout:add(bg_widget)
     bot_layout:add(vpn_widget)
     bot_layout:add(my_mem)
     bot_layout:add(mailwidget)

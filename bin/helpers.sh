@@ -27,4 +27,10 @@ mon)
 vpn)
     ifconfig|grep -q "ppp0" && echo 1 || echo 0
     ;;
+bgd)
+    processes=(fill.sh)
+    for proc in "${processes[@]}"; do
+        pgrep -l $proc >/dev/null 2>&1 && echo $proc
+    done
+    ;;
 esac
