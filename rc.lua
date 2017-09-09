@@ -418,40 +418,40 @@ mailwidgettimer:start()
 -- Weather widget
 
 weather_widget = wibox.container.margin()
-i, w, t, h, wd, ws, c, u = getweather()
-weather_buttons = awful.util.table.join(
-    awful.button({ }, 1, function () 
-        i, w, t, h, wd, ws, c, u = getweather()
-        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
-        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
-    end)
-    )
-weather_widget:setup {
-    {
-        {
-            id = "text",
-            text = i..t.."°C",
-            align = "center",
-            widget = wibox.widget.textbox
-        },
-        id = "bgd",
-        buttons = weather_buttons,
-        widget = wibox.container.background
-    },
-    id = "root",
-    layout = wibox.layout.fixed.vertical
-}
-weather_widget.top = 3
-weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
-weatherwidgettimer = gears.timer({ timeout = 3600 })
-weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
-weatherwidgettimer:connect_signal("timeout",
-    function()
-        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
-        i, w, t, h, wd, ws, c, u = getweather()
-    end
-)
-weatherwidgettimer:start()
+--i, w, t, h, wd, ws, c, u = getweather()
+--weather_buttons = awful.util.table.join(
+--    awful.button({ }, 1, function () 
+--        i, w, t, h, wd, ws, c, u = getweather()
+--        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+--        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
+--    end)
+--    )
+--weather_widget:setup {
+--    {
+--        {
+--            id = "text",
+--            text = i..t.."°C",
+--            align = "center",
+--            widget = wibox.widget.textbox
+--        },
+--        id = "bgd",
+--        buttons = weather_buttons,
+--        widget = wibox.container.background
+--    },
+--    id = "root",
+--    layout = wibox.layout.fixed.vertical
+--}
+--weather_widget.top = 3
+--weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
+--weatherwidgettimer = gears.timer({ timeout = 3600 })
+--weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
+--weatherwidgettimer:connect_signal("timeout",
+--    function()
+--        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+--        i, w, t, h, wd, ws, c, u = getweather()
+--    end
+--)
+--weatherwidgettimer:start()
 
 --- VPN widget
 vpn_widget = wibox.container.margin()
@@ -492,7 +492,7 @@ vpnwidgettimer:connect_signal("timeout",
     end
 )
 vpnwidgettimer:start()
--- Background processes
+-- Background processes widget
 bg_widget = wibox.container.margin()
 bgds = {}
 bg_buttons = awful.util.table.join(
@@ -520,23 +520,23 @@ bg_widget.visible = false
 bg_widgettimer = gears.timer({ timeout = 10 })
 bg_widgettimer:connect_signal("timeout",
     function()
-       awful.spawn.with_line_callback(os.getenv("HOME").."/.config/awesome/bin/helpers.sh bgd", {
-           stdout = function(line)
-                procs = {}
-                table.insert(procs, line)
-           end})
-        if next(procs) ~= nil then
-            for i, c in pairs(procs) do
-               bgds[i] =
-                 {"Kill "..c,
-                  function()
-                     awful.util.spawn("pkill "..c)
-                  end
-                 }
+        procs = {"test.sh", "fill.sh"}
+        bgds={}
+        for i, c in pairs(procs) do
+            awful.spawn.easy_async("/usr/bin/pgrep "..c, function(stdout, stderr, reason, exit_code)
+            if exit_code == 0 then
+                table.insert(bgds, {"Kill "..c,
+                      function()
+                         awful.spawn("pkill "..c)
+                      end
+                     })
             end
-            bg_widget.visible = true
-        else
-            bg_widget.visible = false
+            if next(bgds) ~= nil then
+                bg_widget.visible = true
+            else
+                bg_widget.visible = false
+            end
+            end)
         end
     end
 )
@@ -676,10 +676,10 @@ btt = lain.widget.bat({
                     end
                 end
                 if fullscreenClient and redshift then
-                    awful.util.spawn("redshift -x >/dev/null 2>&1")
+                    awful.spawn("redshift -x >/dev/null 2>&1")
                     redshift = false
                 elseif not fullscreenClient then
-                    awful.util.spawn("redshift -o >/dev/null 2>&1")
+                    awful.spawn("redshift -o >/dev/null 2>&1")
                     redshift = true
                 end
                 for _, checkTab in pairs(check_tabs) do
@@ -748,14 +748,14 @@ my_bat:setup {
 my_bat:buttons(awful.util.table.join(
   awful.button({ }, 1, function() --click to disable suspend
     if suspend == "enabled" then
-        awful.util.spawn("xset s off")
-        awful.util.spawn("xautolock -disable")
+        awful.spawn("xset s off")
+        awful.spawn("xautolock -disable")
         suspend = "manually"
         my_bat.root.bgd:set_bg("#7A4000")
         my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
     else
-        awful.util.spawn("xset s " .. DPMS)
-        awful.util.spawn("xautolock -enable")
+        awful.spawn("xset s " .. DPMS)
+        awful.spawn("xautolock -enable")
         suspend = "enabled"
         my_bat.root.bgd:set_bg(theme.bg_normal)
         my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
