@@ -418,40 +418,40 @@ mailwidgettimer:start()
 -- Weather widget
 
 weather_widget = wibox.container.margin()
---i, w, t, h, wd, ws, c, u = getweather()
---weather_buttons = awful.util.table.join(
---    awful.button({ }, 1, function () 
---        i, w, t, h, wd, ws, c, u = getweather()
---        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
---        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
---    end)
---    )
---weather_widget:setup {
---    {
---        {
---            id = "text",
---            text = i..t.."°C",
---            align = "center",
---            widget = wibox.widget.textbox
---        },
---        id = "bgd",
---        buttons = weather_buttons,
---        widget = wibox.container.background
---    },
---    id = "root",
---    layout = wibox.layout.fixed.vertical
---}
---weather_widget.top = 3
---weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
---weatherwidgettimer = gears.timer({ timeout = 3600 })
---weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
---weatherwidgettimer:connect_signal("timeout",
---    function()
---        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
---        i, w, t, h, wd, ws, c, u = getweather()
---    end
---)
---weatherwidgettimer:start()
+i, w, t, h, wd, ws, c, u = getweather()
+weather_buttons = awful.util.table.join(
+    awful.button({ }, 1, function () 
+        i, w, t, h, wd, ws, c, u = getweather()
+        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
+    end)
+    )
+weather_widget:setup {
+    {
+        {
+            id = "text",
+            text = i..t.."°C",
+            align = "center",
+            widget = wibox.widget.textbox
+        },
+        id = "bgd",
+        buttons = weather_buttons,
+        widget = wibox.container.background
+    },
+    id = "root",
+    layout = wibox.layout.fixed.vertical
+}
+weather_widget.top = 3
+weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
+weatherwidgettimer = gears.timer({ timeout = 3600 })
+weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
+weatherwidgettimer:connect_signal("timeout",
+    function()
+        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+        i, w, t, h, wd, ws, c, u = getweather()
+    end
+)
+weatherwidgettimer:start()
 
 --- VPN widget
 vpn_widget = wibox.container.margin()
