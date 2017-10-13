@@ -391,7 +391,7 @@ mailwidgettimer:connect_signal("timeout",
         mailwidget.root.bgd:set_bg(theme.bg_urgent)
         mailwidget.root.bgd.text:set_text(pr_mail+wrk_mail)
         mailwidget_buttons = awful.util.table.join(
-            awful.button({ }, 1, function () awful.spawn(uerminal .. " -e mutt") end)
+            awful.button({ }, 1, function () awful.spawn(terminal .. " -e mutt") end)
             )
         mailwidget.root.bgd:buttons(mailwidget_buttons)
        else
