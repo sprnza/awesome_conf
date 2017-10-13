@@ -391,7 +391,7 @@ mailwidgettimer:connect_signal("timeout",
         mailwidget.root.bgd:set_bg(theme.bg_urgent)
         mailwidget.root.bgd.text:set_text(pr_mail+wrk_mail)
         mailwidget_buttons = awful.util.table.join(
-            awful.button({ }, 1, function () awful.spawn(terminal .. " -e mutt") end)
+            awful.button({ }, 1, function () awful.spawn(uerminal .. " -e mutt") end)
             )
         mailwidget.root.bgd:buttons(mailwidget_buttons)
        else
@@ -440,7 +440,7 @@ weather_widget:setup {
     id = "root",
     layout = wibox.layout.fixed.vertical
 }
-weather_widget.top = 3
+weather_widget.top = 0
 weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
 weatherwidgettimer = gears.timer({ timeout = 3600 })
 weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
@@ -582,7 +582,7 @@ function volnotify:notify(vol)
 end
 
 my_volume = wibox.container.margin()
-my_volume.top = "3"
+my_volume.top = 0
 
 vlm = lain.widget.alsa({timeout=1,
 settings = function()
@@ -1391,7 +1391,7 @@ awful.rules.rules = {
      { rule = { class = "CURL" },
        properties = { maximized = true } },
      { rule = { class = "XTerm" },
-       properties = { screen = 1, tag = "2" } },
+       properties = { screen = 1, tag = "2" , raise = true} },
      --{ rule = { class = "Luakit" },
      --  properties = { screen = 1, tag = "1" } },
      { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
