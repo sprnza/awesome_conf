@@ -430,7 +430,7 @@ weather_widget:setup {
     {
         {
             id = "text",
-            text = i..t.."°C",
+            text = i..t.."°",
             align = "center",
             widget = wibox.widget.textbox
         },
@@ -1345,6 +1345,7 @@ awful.rules.rules = {
                      screen = awful.screen.preferred,
                      placement = awful.placement.no_overlap+awful.placement.no_offscreen,
                      size_hints_honor = false,
+                     switchtotag = true,
      }
     },
 
@@ -1392,7 +1393,7 @@ awful.rules.rules = {
      { rule = { class = "CURL" },
        properties = { maximized = true } },
      { rule = { class = "XTerm" },
-       properties = { screen = 1, tag = "2" , raise = true} },
+       properties = { screen = 1, tag = "2"} },
      --{ rule = { class = "Luakit" },
      --  properties = { screen = 1, tag = "1" } },
      { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
