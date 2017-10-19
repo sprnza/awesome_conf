@@ -197,6 +197,7 @@ end
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 run_once("nextcloud")
+run_once("telegram-cli -dERDC -P 23911 &")
 --run_once("xxkb")
 run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
