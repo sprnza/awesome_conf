@@ -83,7 +83,7 @@ markup = lain.util.markup
 				bgt:set_widget(ah)
 				ms = wibox.container.margin(bgt, 0, 2, 0, 0)
 				m = wibox.container.margin(ms, 0, 0, 0, 2)
-				bgb:set_bg(beautiful.border_normal)
+				bgb:set_bg(beautiful.bg_normal)
 				bgb:set_widget(m)
 				bgb:buttons(common.create_buttons(buttons, o))
 				data[o] = {
@@ -106,7 +106,7 @@ markup = lain.util.markup
 			if bg == beautiful.taglist_bg_focus then
 				ms:set_color(beautiful.fg_focus)
 			else
-				ms:set_color(beautiful.border_normal)
+				ms:set_color(beautiful.bg_normal)
 			end
 			w:add(bgb)
 	   end
@@ -210,7 +210,7 @@ if hostname == "arch" then
     suspend = "enabled"
 elseif hostname == "laptop" then
     run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
-    run_once("syndaemon -d -k -i 1")
+    run_once("syndaemon -i 0.5 -t -K -R -d")
     run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
     DPMS=180
     suspend = "enabled"
@@ -310,7 +310,7 @@ powerMenu = {
     { "Shutdown", "systemctl poweroff" }
 }
 internetMenu = {
-    { "Firefox Nusha", "env GTK_THEME=Greybird firefox" },
+    { "Internet Nusha", "env GTK_THEME=Greybird palemoon -P Nusha" },
     { "Transmission", "transmission-remote-gtk"},
     { "Skype", "skype" },
     { "Telegram", "telegram-desktop" },
@@ -379,6 +379,7 @@ mailwidget:setup {
     id = "root",
     layout = wibox.layout.fixed.vertical
 }
+mailwidget.root.bgd.forced_height=18
 mailwidget.top = 0
 mailwidget_tip = awful.tooltip({ objects = { mailwidget }})
 mailwidgettimer = gears.timer({ timeout = 10 })
@@ -422,7 +423,7 @@ i, w, t, h, wd, ws, c, u = getweather()
 weather_buttons = awful.util.table.join(
     awful.button({ }, 1, function () 
         i, w, t, h, wd, ws, c, u = getweather()
-        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+--        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
         awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
     end)
     )
@@ -475,7 +476,7 @@ vpn_widget:setup {
     id = "root",
     layout = wibox.layout.fixed.vertical
 }
-vpn_widget.top = 3
+vpn_widget.top = 0
 vpn_widget.visible = false
 vpnwidgettimer = gears.timer({ timeout = 10 })
 vpnwidgettimer:connect_signal("timeout",
@@ -515,7 +516,7 @@ bg_widget:setup {
     id = "root",
     layout = wibox.layout.fixed.vertical
 }
-bg_widget.top = 3
+bg_widget.top = 0
 bg_widget.visible = false
 bg_widgettimer = gears.timer({ timeout = 10 })
 bg_widgettimer:connect_signal("timeout",
@@ -609,9 +610,27 @@ my_volume:buttons(awful.util.table.join(
     awful.button({ }, 4, function () volume("+") end),
     awful.button({ }, 5, function () volume("-") end)
     ))
+-- Memory widget
+mmr = lain.widget.mem{
+    settings = function()
+        if (math.floor(mem_now.used) *1.048576) >= 1000 then
+            displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
+        else
+            displ_mem = math.floor(mem_now.used * 1.048676)
+        end
+            widget:set_text("☢" .. displ_mem)
+    end
+}
+my_mem = wibox.container.margin(
+    wibox.widget {
+        align = "center",
+        widget = mmr.widget
+})
+my_mem.top = 0
+
 -- Battery widget stuff
 my_bat = wibox.container.margin()
-my_bat.top = "3"
+my_bat.top = 0
 my_bat_tip = awful.tooltip({ objects = {my_bat}})
 my_bat.visible = true
 local mpstat = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh mpstat"
@@ -734,17 +753,18 @@ btt = lain.widget.bat({
     end
 })
 my_bat:setup {
-    {
-        {
-            id = "lain_bat",
-            widget = btt.widget
-        },
-        id = "bgd",
-        widget = wibox.container.background
-    },
-    id = "root",
-    layout = wibox.layout.fixed.vertical
+   {
+       {
+           id = "lain_bat",
+           widget = btt.widget
+       },
+       id = "bgd",
+       widget = wibox.container.background
+   },
+   id = "root",
+   layout = wibox.layout.fixed.vertical
 }
+my_bat.root.bgd.forced_height=25
 my_bat:buttons(awful.util.table.join(
   awful.button({ }, 1, function() --click to disable suspend
     if suspend == "enabled" then
@@ -765,6 +785,7 @@ my_bat:buttons(awful.util.table.join(
 
 
 
+
 -- Systray widget
 systray = wibox.container.margin()
 systray:setup {
@@ -776,27 +797,9 @@ if hostname == "arch" then
 	systray.left = 11
 	systray.right = 11
 elseif hostname == "laptop" then
-    systray.left = 10
-    systray.right = 10
+    systray.left = 14
+    systray.right = 14
 end
--- Memory widget
-mmr = lain.widget.mem{
-    settings = function()
-        if (math.floor(mem_now.used) *1.048576) >= 1000 then
-            displ_mem = round(mem_now.used / 1024 * 1.048576, 1) .. "G"
-        else
-            displ_mem = math.floor(mem_now.used * 1.048676)
-        end
-            widget:set_text("☢" .. displ_mem)
-    end
-}
-my_mem = wibox.container.margin(
-    wibox.widget {
-        align = "center",
-        widget = mmr.widget
-})
-my_mem.top = 0
-
 -- Server monitoring widget
 awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(widget, stdout)
     local avg_bg = theme.bg_normal
@@ -911,7 +914,7 @@ txtclock:setup {
     id = "root",
     layout = wibox.layout.flex.horizontal
 }
-txtclock.top = 3
+txtclock.top = 0
 local words = {"годовщина", "Годовщина", "ДР", "birthdays"}
 awful.widget.watch('khal list today --format "{calendar} {title}"', 300, function(widget, stdout)
     for line in stdout:gmatch("[^\r\n]+") do 
@@ -981,36 +984,6 @@ local function set_wallpaper(s)
     end
 end
 
-clock = wibox ({bg = "#000000",
-                width = 300,
-                height = 200,
-                })
-clock.ontop = true
-clock.visible = false
-clock.opacity = "0.7"
-clock:geometry({x = 20, y = 500})
-clock_widget = wibox.widget.textbox()
-value = 0
-clock_widget:set_align("center")
-clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'>" .. value .. "</span>")
-local clock_layout = wibox.layout.fixed.horizontal()
-clock:set_widget(clock_widget)
-clock_timer = gears.timer ({ timeout = 1 })
-clock_timer:connect_signal("timeout",
-	function()
-		clock.visible = true
-	if clock_counter ~= -1 then
-		m = math.floor(clock_counter / 60)
-		s = math.fmod(clock_counter, 60)
-		clock_widget:set_markup("<span foreground='#db6823' font_family='Cantarell' size='65000'>" .. string.format("%02.0f:%02d", m, s) .. "</span>")
-		clock_counter = clock_counter - 1
-	else
-		clock.visible = false
-		clock_timer:stop()
-		naughty.notify({text = "Finished!"})
-	end
-		
-	end	)
 			
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
@@ -1210,12 +1183,10 @@ globalkeys = awful.util.table.join(
     awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end),
     -- Custom keybindings
    awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end),
-   awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK_THEME=Greybird firefox -P Nusha")          end,
-              {description = "launch Nusha's Firefox", group = "custom"}),
-   awful.key({ modkey, "Control" }, "f",     function () awful.spawn("firefox -P Sprnza")          end,
-              {description = "launch Firefox", group = "custom"}),
+   awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK_THEME=Greybird palemoon -P Nusha")          end,
+              {description = "launch Nusha's Palemoon", group = "custom"}),
    awful.key({ modkey, "Control" }, "l",     function () awful.spawn("env GTK_THEME=Greybird luakit")          end,
-              {description = "launch Firefox", group = "custom"}),
+              {description = "launch Luakit", group = "custom"}),
    awful.key({ modkey, "Control" }, "m",     function () awful.spawn(terminal .. " -e mutt")          end,
               {description = "launch Mutt", group = "custom"}),
    awful.key({ modkey, "Control" }, "w",     function () awful.spawn(terminal .. " -class WEECHAT -e ssh server -t 'LANG=en_US.UTF-8 exec tmux a -t weechat'")          end,
@@ -1236,7 +1207,7 @@ globalkeys = awful.util.table.join(
               {description = "Take a screenshot ot the active window", group = "custom"}),
    awful.key({"Mod1" }, "m",     function () awful.spawn(os.getenv("HOME").."/.hud/hud-menu.py") end,
               {description = "Show a HUD menu", group = "custom"}),
-   awful.key({ modkey, "Control" }, "n",     function () awful.spawn("networkmanager_dmenu") end,
+   awful.key({"Mod1", "Control" }, "n",     function () awful.spawn("networkmanager_dmenu") end,
               {description = "Launch networkmanager-dmenu", group = "custom"})
 )
 
@@ -1385,7 +1356,7 @@ awful.rules.rules = {
     },
 
     -- Set Firefox to always map on the tag named "1" on screen 1.
-     { rule_any = { class = {"Firefox", "Luakit"}},
+     { rule_any = { class = {"Firefox", "Luakit", "Pale moon"}},
        except = { type = "dialog"},
        properties = { screen = 1, tag = "1", maximized = true} },
      { rule = { name = "Keyboard" },
@@ -1494,17 +1465,17 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
 				else
 					awful.titlebar.show(c)
 				end
-				if (c.maximized == true) then
-					c.border_width = 0
-                    if c.class == "Firefox" then
-                        awful.titlebar.hide(c)
-                    end
-                else
-                    if c.class == "Firefox" then
-                        awful.titlebar.show(c)
-                    end
-					c.border_width = beautiful.border_width
-                end
+--				if (c.maximized == true) then
+--					c.border_width = 0
+----                    if c.class == "Luakit" then
+----                        awful.titlebar.hide(c)
+----                    end
+--                else
+----                    if c.class == "Luakit" then
+----                        awful.titlebar.show(c)
+----                    end
+--					c.border_width = beautiful.border_width
+--                end
             end
         end
       end)
