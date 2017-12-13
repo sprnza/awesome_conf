@@ -180,7 +180,6 @@ editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
 -- Custom variables
-hostname = io.popen("uname -n"):read()
 
 -- {{ Autostart
 function run_once(cmd)
@@ -203,12 +202,12 @@ run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
 run_once("xcompmgr")
-if hostname == "arch" then
+if awesome.hostname == "arch" then
     DPMS=600
     run_once("numlockx on")
     run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
     suspend = "enabled"
-elseif hostname == "laptop" then
+elseif awesome.hostname == "laptop" then
     run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
     run_once("syndaemon -i 0.5 -t -K -R -d")
     run_once("xautolock -time 5 -locker 'systemctl suspend' -detectsleep &")
@@ -216,7 +215,7 @@ elseif hostname == "laptop" then
     suspend = "enabled"
     --xset = true -- true=battery(180s), false=AC(300s) it's being set inside battery widget callback function
     lock = true -- 1=enabled, 0=disabled
-    elseif hostname == "acer" then
+    elseif awesome.hostname == "acer" then
 	    DPMS=180
 	    suspend = "enabled"
 end
@@ -262,7 +261,7 @@ local function client_menu_toggle_fn()
             instance:hide()
             instance = nil
         else
-            instance = awful.menu.clients({ theme = { width = 250 } })
+            instance = awful.menu.clients({ theme = { width = 100 } })
         end
     end
 end
@@ -293,8 +292,9 @@ end
 
 -- }}}
 
+-- {{{ Launchers
+
 -- {{{ Menu
--- Create a launcher widget and a main menu
 myawesomemenu = {
    { "hotkeys", function() return false, hotkeys_popup.show_help end},
    { "manual", terminal .. " -e man awesome" },
@@ -334,16 +334,17 @@ workMenu = {
     { "Cutecom", "cutecom"},
 }
 
-mymainmenu = awful.menu({ items = { 
-                                    { "Files", "thunar" },
-                                    { "Tools", toolsMenu },
-                                    { "Office", officeMenu },
-                                    { "Internet", internetMenu },
-                                    { "Work", workMenu },
-                                    { "Awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "Power", powerMenu },
-                                  }
-                        })
+mymainmenu = awful.menu({ 
+    items = { 
+        { "Files", "thunar" },
+        { "Tools", toolsMenu },
+        { "Office", officeMenu },
+        { "Internet", internetMenu },
+        { "Work", workMenu },
+        { "Awesome", myawesomemenu, beautiful.awesome_icon },
+        { "Power", powerMenu },
+    }
+})
 
 -- Menubar configuration
 menubar.utils.terminal = terminal -- Set the terminal for applications that require it
@@ -352,13 +353,50 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- }}}
 
 -- Keyboard map indicator and switcher
---local mykeyboardlayout = wibox.widget.textbox()
 kbdwidget = awful.widget.keyboardlayout:new()
 kbdwidget.widget.align = "center"
 
---mykeyboardlayout:set_text(kbw)
---]]
 -- {{{ Custom widgets
+paleLauncher = wibox.container.margin()
+paleLauncher:setup {
+    {      
+        { 
+            image = beautiful.palemoon_icon,
+            widget = wibox.widget.imagebox,
+            resize = true,
+            forced_height = 32,
+            buttons = awful.util.table.join(
+                awful.button({ }, 1, function () 
+                    local pm = false
+                    local pm_c
+                    for _, c in pairs(awful.screen.focused().all_clients) do
+                        if c.class == "Pale moon" then
+                            pm = true
+                            pm_c = c
+                        end
+                    end
+                    if pm then
+                        client.focus = pm_c
+                        pm_c:raise()
+                        pm_c.first_tag:view_only()
+                    else
+                        awful.spawn("env GTK_THEME=greybird palemoon --no-remote -P Nusha")
+                    end
+                end)
+                )
+         },
+        id = "root",
+        widget = wibox.container.margin,
+        left=5
+    },
+    id="right",
+    right=2,
+    color=theme.bg_normal,
+    widget=wibox.container.margin
+}
+
+
+--- mail widget
 mailwidget = wibox.container.margin()
 
 mailwidget_buttons = awful.util.table.join(
@@ -416,6 +454,7 @@ mailwidgettimer:connect_signal("timeout",
     end
 )
 mailwidgettimer:start()
+
 -- Weather widget
 
 weather_widget = wibox.container.margin()
@@ -633,8 +672,8 @@ my_bat = wibox.container.margin()
 my_bat.top = 0
 my_bat_tip = awful.tooltip({ objects = {my_bat}})
 my_bat.visible = true
-local mpstat = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh mpstat"
-local xget = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh xset"
+--local mpstat = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh mpstat"
+--local xget = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh xset"
 local ff_tabs = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh firefox_tabs"
 DPMS = 0
 sleep = 0
@@ -646,7 +685,7 @@ redshift = true
 btt = lain.widget.bat({
         timeout = 60,
         settings=function()
-		if hostname ~= "arch" then
+		if awesome.hostname ~= "arch" then
             --widget:set_text("⚕" .. bat_now.perc .. "%")
             		widget:set_text("⛽" .. bat_now.perc .. "%")
 	    		if bat_now.perc == 100 then
@@ -710,12 +749,13 @@ btt = lain.widget.bat({
                 end
                 if i > 0 or triggerTab or luakit_yt and suspend == "enabled" then
                     awful.spawn("xautolock -disable")
-                    awful.spawn("xset s off")
+                    awful.spawn("xset -dpms")
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
                 elseif i == 0 and not triggerTab and not luakit_yt and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
+                    awful.spawn("xset +dpms")
                     awful.spawn("xset s " .. DPMS)
                     suspend = "enabled"
                     my_bat.root.bgd:set_bg(theme.bg_normal)
@@ -726,6 +766,7 @@ btt = lain.widget.bat({
                 if suspend == "enabled" then
                     if bat_now.ac_status == 1 and xset then -- transition from battery to ac
                         DPMS=300
+                        awful.spawn("xset -dpms")
                         awful.spawn("xset s " .. DPMS)
                         awful.spawn("xautolock -disable")
                         sleep="disabled"
@@ -736,6 +777,7 @@ btt = lain.widget.bat({
                         my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
                     elseif bat_now.ac_status == 0 and not xset then --transition from ac to battery
                         DPMS=180
+                        awful.spawn("xset +dpms")
                         awful.spawn("xset s " .. DPMS)
                         awful.spawn("xautolock -enable")
                         sleep="5 min"
@@ -768,12 +810,13 @@ my_bat.root.bgd.forced_height=25
 my_bat:buttons(awful.util.table.join(
   awful.button({ }, 1, function() --click to disable suspend
     if suspend == "enabled" then
-        awful.spawn("xset s off")
+        awful.spawn("xset -dpms")
         awful.spawn("xautolock -disable")
         suspend = "manually"
         my_bat.root.bgd:set_bg("#7A4000")
         my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
     else
+        awful.spawn("xset +dpms")
         awful.spawn("xset s " .. DPMS)
         awful.spawn("xautolock -enable")
         suspend = "enabled"
@@ -793,10 +836,10 @@ systray:setup {
 	widget = wibox.widget.systray()
 }
 systray.sstr:set_horizontal(false)
-if hostname == "arch" then
-	systray.left = 11
-	systray.right = 11
-elseif hostname == "laptop" then
+if awesome.hostname == "arch" then
+	systray.left = 13
+	systray.right = 13
+elseif awesome.hostname == "laptop" then
     systray.left = 14
     systray.right = 14
 end
@@ -931,46 +974,47 @@ cal = lain.widget.calendar({attach_to = {txtclock}, cal = os.getenv("HOME") .. "
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = awful.util.table.join(
-                    awful.button({ }, 1, function(t) t:view_only() end),
-                    awful.button({ modkey }, 1, function(t)
-                                              if client.focus then
-                                                  client.focus:move_to_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 3, awful.tag.viewtoggle),
-                    awful.button({ modkey }, 3, function(t)
-                                              if client.focus then
-                                                  client.focus:toggle_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
-                    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
+    awful.button({ }, 1, function(t) t:view_only() end),
+    awful.button({ modkey }, 1, function(t)
+        if client.focus then
+            client.focus:move_to_tag(t)
+        end
+    end),
+    awful.button({ }, 3, awful.tag.viewtoggle),
+    awful.button({ modkey }, 3, function(t)
+        if client.focus then
+            client.focus:toggle_tag(t)
+        end
+    end),
+    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
+    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
                 )
 
 local tasklist_buttons = awful.util.table.join(
-                     awful.button({ }, 1, function (c)
-                                              if c == client.focus then
-                                                  c.minimized = true
-                                              else
-                                                  -- Without this, the following
-                                                  -- :isvisible() makes no sense
-                                                  c.minimized = false
-                                                  if not c:isvisible() and c.first_tag then
-                                                      c.first_tag:view_only()
-                                                  end
-                                                  -- This will also un-minimize
-                                                  -- the client, if needed
-                                                  client.focus = c
-                                                  c:raise()
-                                              end
-                                          end),
-                     awful.button({ }, 3, client_menu_toggle_fn()),
-                     awful.button({ }, 4, function ()
-                                              awful.client.focus.byidx(1)
-                                          end),
-                     awful.button({ }, 5, function ()
-                                              awful.client.focus.byidx(-1)
-                                          end))
+    awful.button({ }, 1, function (c)
+        if c == client.focus then
+            c.minimized = true
+        else
+            -- Without this, the following
+            -- :isvisible() makes no sense
+            c.minimized = false
+            if not c:isvisible() and c.first_tag then
+                c.first_tag:view_only()
+            end
+            -- This will also un-minimize
+            -- the client, if needed
+            client.focus = c
+            c:raise()
+        end
+    end),
+    awful.button({ }, 3, client_menu_toggle_fn()),
+    awful.button({ }, 4, function ()
+        awful.client.focus.byidx(1)
+    end),
+    awful.button({ }, 5, function ()
+        awful.client.focus.byidx(-1)
+    end)
+)
 
 local function set_wallpaper(s)
     -- Wallpaper
@@ -993,7 +1037,7 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    if hostname == "acer" or hostname == "arch" then
+    if awesome.hostname == "acer" or awesome.hostname == "arch" then
 	    tag_layout = awful.layout.layouts[2] --tile
     else
 	    tag_layout = awful.layout.layouts[1] --float
@@ -1019,34 +1063,19 @@ awful.screen.connect_for_each_screen(function(s)
 
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "left", screen = s, width = 44})
+    s.mywibar = awful.wibar({ position = "left", screen = s, width = 44})
 
     -- Add widgets to the wibox
-    local top_layout = wibox.layout.fixed.vertical()
-    top_layout:add(s.mytaglist)
-    local mid_layout =  wibox.layout.fixed.vertical()
-    mid_layout:add(s.mytasklist)
-    local bot_layout = wibox.layout.fixed.vertical()
-    --bot_layout:add(wibox.widget.systray)
-    bot_layout:add(systray)
-    bot_layout:add(srv_mon)
-    bot_layout:add(bg_widget)
-    bot_layout:add(vpn_widget)
-    bot_layout:add(my_mem)
-    bot_layout:add(mailwidget)
-    bot_layout:add(my_bat)
-    bot_layout:add(weather_widget)
-    bot_layout:add(my_volume)
-    bot_layout:add(kbdwidget)
-    bot_layout:add(s.mylayoutbox)
-    bot_layout:add(txtclock)
+    local top_layout = wibox.layout.fixed.vertical(s.mytaglist, paleLauncher)
+    local mid_layout =  wibox.layout.fixed.vertical(s.mytasklist)
+    local bot_layout = wibox.layout.fixed.vertical(systray, srv_mon, bg_widget, vpn_widget, my_mem, mailwidget, my_bat, weather_widget, my_volume, kbdwidget, s.mylayoutbox, txtclock)
     
     local layout = wibox.layout.align.vertical()
     layout:set_top(top_layout)
     layout:set_middle(mid_layout)
     layout:set_bottom(bot_layout)
 
-    s.mywibox:set_widget(layout)
+    s.mywibar:set_widget(layout)
 
 end)
 -- }}}
@@ -1338,7 +1367,7 @@ awful.rules.rules = {
           "xtightvncviewer",
           "Keepassx2",
           "Tk",
-         -- "mpv",
+          "Dialog",
           "SpeedCrunch"},
 
         name = {
@@ -1356,9 +1385,12 @@ awful.rules.rules = {
     },
 
     -- Set Firefox to always map on the tag named "1" on screen 1.
-     { rule_any = { class = {"Firefox", "Luakit", "Pale moon"}},
+     { rule_any = { class = {"Firefox", "Luakit"}},
        except = { type = "dialog"},
        properties = { screen = 1, tag = "1", maximized = true} },
+     { rule_any = { class = {"Pale moon"}},
+       except = { type = "dialog"},
+       properties = { screen = 1, tag = "1", maximized = true, skip_taskbar = true} },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
      { rule = { class = "CURL" },
@@ -1407,7 +1439,11 @@ client.connect_signal("unmanage", function (c)
         awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "2"))
         master_increased = false
     end
+    if c.class == "Pale moon" then
+        paleLauncher.right:set_color(theme.bg_normal)
+    end
 end)
+
 
 -- Add a titlebar if titlebars_enabled is set to true in the rules.
 client.connect_signal("request::titlebars", function(c)
@@ -1449,8 +1485,20 @@ end)
 --    end
 --end)
 
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+client.connect_signal("focus", function(c) 
+    c.border_color = beautiful.border_focus 
+    if c.class == "Pale moon" then
+        paleLauncher.right:set_color(theme.highlight_light)
+    end
+
+
+end)
+client.connect_signal("unfocus", function(c) 
+    c.border_color = beautiful.border_normal 
+    if c.class == "Pale moon" then
+        paleLauncher.right:set_color(theme.bg_normal)
+    end
+end)
 -- }}}
 
 -- {{{ Arrange signal handler
@@ -1458,12 +1506,14 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
         local clients = screen[s].clients
         local layout  = awful.layout.getname(awful.layout.get(s))
 
-        if #clients > 0 then -- Fine grained borders and floaters control
-            for _, c in pairs(clients) do -- Floaters always have borders
+        if #clients > 0 then
+            for _, c in pairs(clients) do
                 if layout == "tile" then
 					awful.titlebar.hide(c)
+                   -- c.maximized_vertical = true
 				else
 					awful.titlebar.show(c)
+                   --  c.maximized_vertical = true
 				end
 --				if (c.maximized == true) then
 --					c.border_width = 0

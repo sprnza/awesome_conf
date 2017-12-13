@@ -56,6 +56,7 @@ theme.titlebar_minimize_button_normal_inactive = theme.tb_hide_inactive
 theme.titlebar_minimize_button_focus_inactive = theme.tb_hide_active
 theme.titlebar_minimize_button_normal_active = theme.tb_hide_inactive
 theme.titlebar_minimize_button_focus_active = theme.tb_hide_active
+theme.palemoon_icon              = os.getenv("HOME") .. "/.config/awesome/themes/icons/palemoon.png"
 
 theme.titlebar_bg_normal = "#2F343F"
 theme.titlebar_bg = "#2F343F"
