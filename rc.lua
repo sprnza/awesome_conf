@@ -16,7 +16,6 @@ local lain = require("lain")
 
 -- Custom libraries
 local weather = require("weather")
---local tyrannical = require("tyrannical")
 
 local dpi = require("beautiful").xresources.apply_dpi
 
@@ -1184,71 +1183,6 @@ awful.screen.connect_for_each_screen(function(s)
 
 end)
 -- }}}
--- Tyrannical tags configuration
---tyrannical.tags = {
---    {
---        name        = "Nush",                 -- Call the tag "Term"
---        init        = true,                   -- Load the tag on startup
---        screen      = 1,                  -- Create this tag on screen 1 and screen 2
---        layout      = awful.layout.suit.float, -- Use the tile layout
---       -- instance    = {"dev", "ops"},         -- Accept the following instances. This takes precedence over 'class'
---       -- class       = { --Accept the following classes, refuse everything else (because of "exclusive=true")
---       --     "xterm" , "urxvt" , "aterm","URxvt","XTerm","konsole","terminator","gnome-terminal"
---       -- }
---    } ,
---    {
---        name        = "Term",
---        init        = true,
---        exclusive   = true,
---      --icon        = "~net.png",                 -- Use this icon for the tag (uncomment with a real path)
---        screen      = 1,
---        layout      = awful.layout.suit.tile,      -- Use the max layout
---        class = {"Xterm"}
---
---    } ,
---    {
---        name        = "Den",
---        init        = true,
---        --exclusive   = true,
---        screen      = 1,
---        layout      = awful.layout.suit.tile,
---        fallback    = true,
---        --class ={
---        --    "Kate", "KDevelop", "Codeblocks", "Code::Blocks" , "DDD", "kate4"}
---        --} ,
---    },
---    {
---        name        = "Chat",
---        init        = true,
---        exclusive   = true,
---        screen      = 1,
---        layout      = awful.layout.suit.tile,
---        class ={ "TelegramDesktop", "WEECHAT"}
---    } ,
-----    {
-----        name        = "Files",
-----        init        = true,
-----        exclusive   = true,
-----        screen      = 1,
-----        layout      = awful.layout.suit.tile,
-----        exec_once   = {"Thunar"}, --When the tag is accessed for the first time, execute this command
-----        class  = {
-----            "Thunar", "Konqueror", "Dolphin", "ark", "Nautilus","emelfm"
-----        }
-----    } ,
---    {
---        name        = "Doc",
---        init        = false, -- This tag wont be created at startup, but will be when one of the
---                             -- client in the "class" section will start. It will be created on
---                             -- the client startup screen
---        exclusive   = true,
---        layout      = awful.layout.suit.max,
---        instance    = { "libreoffice" },
---        --class       = { "Assistant", "Okular", "Evince", "EPDFviewer", "xpdf", "Xpdf",}
---    } ,
---}
---tyrannical.settings.block_children_focus_stealing = true --Block popups ()
---tyrannical.settings.group_children = true --Force popups/dialogs to have the same tags as the parent client
 
 -- {{{ Mouse bindings
 root.buttons(gears.table.join(
