@@ -465,7 +465,10 @@ thunarLauncher:setup {
     color=theme.bg_normal,
     widget=wibox.container.margin
 }
-
+if awesome.hostname == "arch" then
+    paleLauncher.visible = false
+    thunarLauncher.visible = false
+end
 
 --- mail widget
 mailwidget = wibox.container.margin()
@@ -846,7 +849,7 @@ btt = lain.widget.bat({
                         if not awesome.startup then
                             naughty.notify({text = "Power connected"})
                         end
-                        my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
+                        my_bat_ip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
                     elseif bat_now.ac_status == 0 and not xset then --transition from ac to battery
                         DPMS=180
                         awful.spawn("xset +dpms")
@@ -957,7 +960,7 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/local_status"', 300, function(w
     local hdd_bg = theme.bg_normal
     local upd_bg = theme.bg_normal
     local ram_bg = theme.bg_normal
-    srv_mon.root.right_loc:set_bg(theme.bg_normal)
+    rv_mon.root.right_loc:set_bg(theme.bg_normal)
     local lines = {}
     for line in stdout:gmatch("[^\r\n]+") do 
         lines[#lines + 1] = line
@@ -1012,8 +1015,8 @@ srv_mon:setup {
     layout = wibox.layout.flex.horizontal
 }
 srv_mon.top = 3
-srv_tip = awful.tooltip({ objects = { srv_mon.root.bgd }})
-loc_tip = awful.tooltip({ objects = { srv_mon.root.bgd_loc}})
+srv_tip = awful.tooltip({ objects = { srv_mon.root.left }})
+loc_tip = awful.tooltip({ objects = { srv_mon.root.right}})
 -- }}}
 
 -- {{{ Wibar
@@ -1114,11 +1117,13 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
-    awful.tag.add("Nush", {
-        layout = awful.layout.layouts[1],
-        screen = s,
-        selected = true
-    })
+    if awesome.hostname ~= "arch" then
+        awful.tag.add("Nush", {
+            layout = awful.layout.layouts[1],
+            screen = s,
+            selected = true
+        })
+    end
     awful.tag.add("Term", {
         layout = awful.layout.layouts[2],
         screen = s,
