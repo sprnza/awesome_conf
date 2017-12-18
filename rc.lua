@@ -240,6 +240,7 @@ if awesome.hostname == "arch" then
     DPMS=600
     run_once("numlockx on")
     run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
+    run_once("xset s off")
     suspend = "enabled"
 elseif awesome.hostname == "laptop" then
     run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
@@ -344,7 +345,7 @@ powerMenu = {
     { "Shutdown", "systemctl poweroff" }
 }
 internetMenu = {
-    { "Internet Nusha", "env GTK_THEME=Greybird palemoon -P Nusha" },
+    { "Internet Nusha", "env GTK2_RC_FILES=/home/speranza/.gtkrc-2.0-light palemoon -P Nusha" },
     { "Transmission", "transmission-remote-gtk"},
     { "Skype", "skype" },
     { "Telegram", "telegram-desktop" },
@@ -414,7 +415,7 @@ paleLauncher:setup {
                         pm_c:raise()
                         pm_c.first_tag:view_only()
                     else
-                        awful.spawn("env GTK_THEME=greybird palemoon --no-remote -P Nusha")
+                        awful.spawn("env GTK2_RC_FILES=/home/speranza/.gtkrc-2.0-light palemoon --no-remote -P Nusha")
                     end
                 end)
                 )
@@ -451,7 +452,7 @@ thunarLauncher:setup {
                         t_c:raise()
                         t_c.first_tag:view_only()
                     else
-                        awful.spawn("env GTK_THEME=greybird thunar")
+                        awful.spawn("env GTK2_RC_FILES=/home/speranza/.gtkrc-2.0-light thunar")
                     end
                 end)
                 )
@@ -1368,9 +1369,9 @@ globalkeys = gears.table.join(
     awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end),
     -- Custom keybindings
    awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end),
-   awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK_THEME=Greybird palemoon -P Nusha")          end,
+   awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK2_RC_FILES=/home/speranza/.gtkrc-2.0-light palemoon -P Nusha")          end,
               {description = "launch Nusha's Palemoon", group = "custom"}),
-   awful.key({ modkey, "Control" }, "l",     function () awful.spawn("env GTK_THEME=Greybird luakit")          end,
+   awful.key({ modkey, "Control" }, "l",     function () awful.spawn("env GTK2_RC_FILES=/home/speranza/.gtkrc-2.0-light luakit")          end,
               {description = "launch Luakit", group = "custom"}),
    awful.key({ modkey, "Control" }, "m",     function () awful.spawn(terminal .. " -e mutt")          end,
               {description = "launch Mutt", group = "custom"}),
@@ -1489,6 +1490,12 @@ root.keys(globalkeys)
 
 -- {{{ Rules
 -- Rules to apply to new clients (through the "manage" signal).
+
+if awesome.hostname == "laptop" then
+    is_laptop = true
+else
+    is_laptop = false
+end
 awful.rules.rules = {
     -- All clients will match this rule.
     { rule = { },
@@ -1546,11 +1553,11 @@ awful.rules.rules = {
        properties = { screen = 1, tag = "Den", maximized = true} },
      { rule_any = { class = {"Pale moon"}},
        except = { type = "dialog"},
-       properties = { tag = "Nush", skip_taskbar = true} },
+       properties = { tag = "Nush", skip_taskbar = is_laptop} },
+     { rule = { class = "Thunar" },
+       properties = { skip_taskbar = is_laptop } },
      { rule = { name = "Keyboard" },
        properties = { focusable = false, ontop = true } },
-     { rule = { class = "Thunar" },
-       properties = { skip_taskbar = true } },
      { rule = { class = "CURL" },
        properties = { maximized = true } },
      { rule = { class = "XTerm" },
