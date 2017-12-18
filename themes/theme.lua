@@ -1,8 +1,14 @@
+local theme_assets = require("beautiful.theme_assets")
 local xresources = require("beautiful.xresources")
 local xrdb = xresources.get_current_theme()
+local dpi = xresources.apply_dpi
+
+local gfs = require("gears.filesystem")
+local themes_path = gfs.get_themes_dir()
+local config_path = gfs.get_configuration_dir()
 
 theme                               = {}
-theme.wallpaper                     = "~/Downloads/Wallpapers/jingle_hell_by_ivan_bliznak-d4jjver.jpg"
+theme.wallpaper                     = config_path .. "themes/wallpaper.jpg"
 
 theme.font                          = "Cantarell 11"
 theme.naughty_font                  = "Monospace Regular"
@@ -26,6 +32,14 @@ theme.taglist_bg_normal             = theme.color_dark
 theme.taglist_bg_focus              = theme.color_dark
 theme.taglist_fg_normal             = theme.text_light
 theme.taglist_fg_focus              = theme.highlight_dark
+local taglist_square_size = dpi(4)
+theme.taglist_squares_sel = theme_assets.taglist_squares_sel(
+    taglist_square_size, theme.highlight_light
+)
+theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(
+    taglist_square_size, theme.text_dark
+)
+
 theme.tasklist_bg_normal            = theme.color_dark
 theme.tasklist_bg_focus             = theme.highlight_dark
 theme.tooltip_bg                    = xrdb.background
@@ -34,18 +48,19 @@ theme.tooltip_border_width          = "1"
 theme.tooltip_border_color          = theme.highlight_light
 theme.bg_systray                    = theme.color_dark
 
-theme.menu_width                    = "150"
+theme.menu_width                    = dpi(100)
+theme.menu_border_color             = theme.highlight_dark
 theme.useless_gap                   = "0"
 -- icon used when a client has no default
 theme.generic_icon = "/usr/share/icons/Menda-Circle/apps/48x48/apps/utilities-terminal.svg"
 theme.ff_icon = "/usr/share/icons/Menda-Circle/apps/48x48/apps/firefox-original.svg"
 -- titlebar buttons
-theme.tb_close_active              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_active.png"
-theme.tb_close_inactive              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_close_inactive.png"
-theme.tb_hide_active              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_hide_active.png"
-theme.tb_hide_inactive              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_hid_inactive.png"
-theme.tb_max_active              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_max_active.png"
-theme.tb_max_inactive              = os.getenv("HOME") .. "/.config/awesome/themes/icons/tb_max_inactive.png"
+theme.tb_close_active              = config_path .. "themes/icons/tb_close_active.png"
+theme.tb_close_inactive              = config_path .. "themes/icons/tb_close_inactive.png"
+theme.tb_hide_active              = config_path .. "themes/icons/tb_hide_active.png"
+theme.tb_hide_inactive              = config_path .. "themes/icons/tb_hid_inactive.png"
+theme.tb_max_active              = config_path .. "themes/icons/tb_max_active.png"
+theme.tb_max_inactive              = config_path .. "themes/icons/tb_max_inactive.png"
 theme.titlebar_close_button_normal = theme.tb_close_inactive
 theme.titlebar_close_button_focus  = theme.tb_close_active
 theme.titlebar_maximized_button_normal_inactive = theme.tb_max_inactive
@@ -56,7 +71,8 @@ theme.titlebar_minimize_button_normal_inactive = theme.tb_hide_inactive
 theme.titlebar_minimize_button_focus_inactive = theme.tb_hide_active
 theme.titlebar_minimize_button_normal_active = theme.tb_hide_inactive
 theme.titlebar_minimize_button_focus_active = theme.tb_hide_active
-theme.palemoon_icon              = os.getenv("HOME") .. "/.config/awesome/themes/icons/palemoon.png"
+theme.palemoon_icon              = config_path .. "themes/icons/palemoon.png"
+theme.thunar_icon              = config_path .. "themes/icons/thunar.png"
 
 theme.titlebar_bg_normal = "#2F343F"
 theme.titlebar_bg = "#2F343F"

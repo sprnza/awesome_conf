@@ -16,9 +16,7 @@ local lain = require("lain")
 
 -- Custom libraries
 local weather = require("weather")
---local tyrannical = require("tyrannical")
-
-local dpi = require("beautiful").xresources.apply_dpi
+local tyrannical = require("tyrannical")
 
 
 -- {{{ Notifications position and border width
@@ -64,14 +62,12 @@ markup = lain.util.markup
 
 
 -- {{ Custom functions
--- Custom verticaltag and verticaltask are here for custom highlighting. By default there is no such a vertical line in the right of tag name and an active client's icon.
     function verticaltag(w, buttons, label, data, objects)
 		w:reset()
 		for i, o in ipairs(objects) do
 			local cache = data[o]
-			local ib, tb, bgb, m, ah, bgt, ms
+			local tb, bgb, m, ah, bgt, ms
 			if cache then
-                ib = cache.ib
 				tb = cache.tb
 				bgb = cache.bgb
 				m = cache.m
@@ -79,14 +75,11 @@ markup = lain.util.markup
 				bgt = cache.bgt
 				ms = cache.ms
 			else
-                ib = wibox.widget.imagebox()
 				tb = wibox.widget.textbox()
 				bgb = wibox.container.background()
 				bgt = wibox.container.background()
 				ah = wibox.layout.align.horizontal()
-                ibm = wibox.container.margin(ib, dpi(4))
 				ah:set_middle(tb)
-                ah:set_left(ibm)
                 ah:set_expand("none")
 				bgt:set_widget(ah)
 				ms = wibox.container.margin(bgt, 0, 2, 0, 0)
@@ -95,53 +88,27 @@ markup = lain.util.markup
 				bgb:set_widget(m)
 				bgb:buttons(common.create_buttons(buttons, o))
 				data[o] = {
-                    ib = ib,
 					tb = tb,
 					bgb = bgb,
 					m   = m,
 					ah = ah,
 					bgt = bgt,
-					ms = ms,
-                    ibm = ibm
+					ms = ms
 				}
 			end
-			local text, bg, bg_image, icon, args = label(o)
-            args = args or {}
-			--if not pcall(tb.set_markup, tb, markup(beautiful.text_dark, text)) then
-			--	tb:set_markup("<i>&lt;Invalid text&gt;</i>")
-			--end
-			--if bg_image == "light" then
-			--	tb:set_markup(markup(beautiful.text_light, text))
-			--end
-			--bgt:set_bg(bg)
+			local text, bg, bg_image, icon = label(o)
+			if not pcall(tb.set_markup, tb, markup(beautiful.text_dark, text)) then
+				tb:set_markup("<i>&lt;Invalid text&gt;</i>")
+			end
+			if bg_image == "light" then
+				tb:set_markup(markup(beautiful.text_light, text))
+			end
+			bgt:set_bg(bg)
 			if bg == beautiful.taglist_bg_focus then
 				ms:set_color(beautiful.fg_focus)
 			else
 				ms:set_color(beautiful.bg_normal)
 			end
-
-
-                    -- The text might be invalid, so use pcall.
-            if text == nil or text == "" then
-                tbm:set_margins(0)
-            else
-                if not tb:set_markup_silently(text) then
-                    tb:set_markup("<i>&lt;Invalid text&gt;</i>")
-                end
-            end
-            bgb:set_bg(bg)
-            if type(bg_image) == "function" then
-                -- TODO: Why does this pass nil as an argument?
-                bg_image = bg_image(tb,o,nil,objects,i)
-            end
-            bgb:set_bgimage(bg_image)
-
-
-            --if icon then
-            --    ib:set_image(icon)
-            --else
-            --    imb:set_margins(0)
-            --end
 			w:add(bgb)
 	   end
 	end
@@ -399,7 +366,7 @@ paleLauncher:setup {
             widget = wibox.widget.imagebox,
             resize = true,
             forced_height = 32,
-            buttons = gears.table.join(
+            buttons = awful.util.table.join(
                 awful.button({ }, 1, function () 
                     local pm = false
                     local pm_c
@@ -436,7 +403,7 @@ thunarLauncher:setup {
             widget = wibox.widget.imagebox,
             resize = true,
             forced_height = 32,
-            buttons = gears.table.join(
+            buttons = awful.util.table.join(
                 awful.button({ }, 1, function () 
                     local t = false
                     local t_c
@@ -470,7 +437,7 @@ thunarLauncher:setup {
 --- mail widget
 mailwidget = wibox.container.margin()
 
-mailwidget_buttons = gears.table.join(
+mailwidget_buttons = awful.util.table.join(
     awful.button({ }, 1, function () awful.spawn(terminal .. " -e mutt") end)
     )
 mailwidget:setup {
@@ -501,14 +468,14 @@ mailwidgettimer:connect_signal("timeout",
        if ( pr_mail > 0 or wrk_mail > 0) then
         mailwidget.root.bgd:set_bg(theme.bg_urgent)
         mailwidget.root.bgd.text:set_text(pr_mail+wrk_mail)
-        mailwidget_buttons = gears.table.join(
+        mailwidget_buttons = awful.util.table.join(
             awful.button({ }, 1, function () awful.spawn(terminal .. " -e mutt") end)
             )
         mailwidget.root.bgd:buttons(mailwidget_buttons)
        else
         mailwidget.root.bgd:set_bg(theme.bg_normal)
         mailwidget.root.bgd.text:set_text("@")
-        mailwidget_buttons = gears.table.join(
+        mailwidget_buttons = awful.util.table.join(
             awful.button({ }, 1, function () awful.spawn(terminal .. " -e mutt") end)
             )
         mailwidget.root.bgd:buttons(mailwidget_buttons)
@@ -516,7 +483,7 @@ mailwidgettimer:connect_signal("timeout",
        if ( telegram > 0 ) then
         mailwidget.root.bgd:set_bg("#009DFF")
         mailwidget.root.bgd.text:set_text(telegram)
-        mailwidget_buttons = gears.table.join(
+        mailwidget_buttons = awful.util.table.join(
             awful.button({ }, 1, function () awful.spawn("telegram-desktop") end)
             )
         mailwidget.root.bgd:buttons(mailwidget_buttons)
@@ -530,10 +497,10 @@ mailwidgettimer:start()
 
 weather_widget = wibox.container.margin()
 i, w, t, h, wd, ws, c, u = getweather()
-if i == nil then i, w, t, h, wd, ws, c, u = "", "na", "N/A", "na", "na", "na", "na", "na" end
-weather_buttons = gears.table.join(
+weather_buttons = awful.util.table.join(
     awful.button({ }, 1, function () 
         i, w, t, h, wd, ws, c, u = getweather()
+--        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
         awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
     end)
     )
@@ -558,8 +525,7 @@ weatherwidgettimer = gears.timer({ timeout = 3600 })
 weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
 weatherwidgettimer:connect_signal("timeout",
     function()
-        --mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
-
+        mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
         i, w, t, h, wd, ws, c, u = getweather()
     end
 )
@@ -567,7 +533,7 @@ weatherwidgettimer:start()
 
 --- VPN widget
 vpn_widget = wibox.container.margin()
-vpn_buttons = gears.table.join(
+vpn_buttons = awful.util.table.join(
     awful.button({ }, 1, function () 
         awful.spawn("networkmanager_dmenu")
     end)
@@ -607,7 +573,7 @@ vpnwidgettimer:start()
 -- Background processes widget
 bg_widget = wibox.container.margin()
 bgds = {}
-bg_buttons = gears.table.join(
+bg_buttons = awful.util.table.join(
     awful.button({ }, 1, function () 
         awful.menu(bgds):show()
     end)
@@ -716,7 +682,7 @@ my_volume:setup {
     id = "vlm",
     widget = vlm.widget
 }
-my_volume:buttons(gears.table.join(
+my_volume:buttons(awful.util.table.join(
     awful.button({ }, 1, function () volume("toggle") end),
     awful.button({ }, 4, function () volume("+") end),
     awful.button({ }, 5, function () volume("-") end)
@@ -879,7 +845,7 @@ my_bat:setup {
    layout = wibox.layout.fixed.vertical
 }
 my_bat.root.bgd.forced_height=25
-my_bat:buttons(gears.table.join(
+my_bat:buttons(awful.util.table.join(
   awful.button({ }, 1, function() --click to disable suspend
     if suspend == "enabled" then
         awful.spawn("xset -dpms")
@@ -1051,7 +1017,7 @@ end)
 cal = lain.widget.calendar({attach_to = {txtclock}, cal = os.getenv("HOME") .. "/.config/awesome/bin/cal.sh", notification_preset = {fg = theme.text_dark,bg = theme.bg_normal, border_color = theme.highlight_light, font = "Monospace Regular 11", position = "bottom_left"}, icons = "/"})
 
 -- Create a wibox for each screen and add it
-local taglist_buttons = gears.table.join(
+local taglist_buttons = awful.util.table.join(
     awful.button({ }, 1, function(t) t:view_only() end),
     awful.button({ modkey }, 1, function(t)
         if client.focus then
@@ -1068,7 +1034,7 @@ local taglist_buttons = gears.table.join(
     awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
                 )
 
-local tasklist_buttons = gears.table.join(
+local tasklist_buttons = awful.util.table.join(
     awful.button({ }, 1, function (c)
         if c == client.focus then
             c.minimized = true
@@ -1114,31 +1080,31 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
-    awful.tag.add("Nush", {
-        layout = awful.layout.layouts[1],
-        screen = s,
-        selected = true
-    })
-    awful.tag.add("Term", {
-        layout = awful.layout.layouts[2],
-        screen = s,
-    })
-    awful.tag.add("Den", {
-        layout = awful.layout.layouts[2],
-        screen = s,
-    })
-    awful.tag.add("Chat", {
-        layout = awful.layout.layouts[2],
-        screen = s,
-    })
-    awful.tag.add("Docs", {
-        layout = awful.layout.layouts[2],
-        screen = s,
-    })
-    awful.tag.add("Devs", {
-        layout = awful.layout.layouts[2],
-        screen = s,
-    })
+--    awful.tag.add("Nush", {
+--        layout = awful.layout.layouts[1],
+--        screen = s,
+--        selected = true
+--    })
+--    awful.tag.add("Term", {
+--        layout = awful.layout.layouts[2],
+--        screen = s,
+--    })
+--    awful.tag.add("Den", {
+--        layout = awful.layout.layouts[2],
+--        screen = s,
+--    })
+--    awful.tag.add("Chat", {
+--        layout = awful.layout.layouts[2],
+--        screen = s,
+--    })
+--    awful.tag.add("Docs", {
+--        layout = awful.layout.layouts[2],
+--        screen = s,
+--    })
+--    awful.tag.add("Devs", {
+--        layout = awful.layout.layouts[2],
+--        screen = s,
+--    })
 
 
 
@@ -1147,13 +1113,13 @@ awful.screen.connect_for_each_screen(function(s)
     s.mypromptbox = awful.widget.prompt()
     -- Create an imagebox widget which will contains an icon indicating which layout we're using.
     -- We need one layoutbox per screen.
---    s.mylayoutbox = awful.widget.layoutbox(s)
---    s.mylayoutbox = wibox.container.margin(awful.widget.layoutbox(s), 4, 4, 4, 4)
---    s.mylayoutbox:buttons(gears.table.join(
---                           awful.button({ }, 1, function () awful.layout.inc( 1) end),
---                           awful.button({ }, 3, function () awful.layout.inc(-1) end),
---                           awful.button({ }, 4, function () awful.layout.inc( 1) end),
---                           awful.button({ }, 5, function () awful.layout.inc(-1) end)))
+    s.mylayoutbox = awful.widget.layoutbox(s)
+    s.mylayoutbox = wibox.container.margin(awful.widget.layoutbox(s), 4, 4, 4, 4)
+    s.mylayoutbox:buttons(awful.util.table.join(
+                           awful.button({ }, 1, function () awful.layout.inc( 1) end),
+                           awful.button({ }, 3, function () awful.layout.inc(-1) end),
+                           awful.button({ }, 4, function () awful.layout.inc( 1) end),
+                           awful.button({ }, 5, function () awful.layout.inc(-1) end)))
     -- Create a taglist widget
     s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, taglist_buttons, nil, verticaltag, wibox.layout.fixed.vertical())
 
@@ -1167,7 +1133,7 @@ awful.screen.connect_for_each_screen(function(s)
     -- Add widgets to the wibox
     local top_layout = wibox.layout.fixed.vertical(s.mytaglist, paleLauncher, thunarLauncher)
     local mid_layout =  wibox.layout.fixed.vertical(s.mytasklist)
-    local bot_layout = wibox.layout.fixed.vertical(systray, srv_mon, bg_widget, vpn_widget, my_mem, mailwidget, my_bat, weather_widget, my_volume, kbdwidget, txtclock)
+    local bot_layout = wibox.layout.fixed.vertical(systray, srv_mon, bg_widget, vpn_widget, my_mem, mailwidget, my_bat, weather_widget, my_volume, kbdwidget, s.mylayoutbox, txtclock)
     
     local layout = wibox.layout.align.vertical()
     layout:set_top(top_layout)
@@ -1179,73 +1145,73 @@ awful.screen.connect_for_each_screen(function(s)
 end)
 -- }}}
 -- Tyrannical tags configuration
---tyrannical.tags = {
+tyrannical.tags = {
+    {
+        name        = "Nush",                 -- Call the tag "Term"
+        init        = true,                   -- Load the tag on startup
+        screen      = 1,                  -- Create this tag on screen 1 and screen 2
+        layout      = awful.layout.suit.float, -- Use the tile layout
+       -- instance    = {"dev", "ops"},         -- Accept the following instances. This takes precedence over 'class'
+       -- class       = { --Accept the following classes, refuse everything else (because of "exclusive=true")
+       --     "xterm" , "urxvt" , "aterm","URxvt","XTerm","konsole","terminator","gnome-terminal"
+       -- }
+    } ,
+    {
+        name        = "Term",
+        init        = true,
+        exclusive   = true,
+      --icon        = "~net.png",                 -- Use this icon for the tag (uncomment with a real path)
+        screen      = 1,
+        layout      = awful.layout.suit.tile,      -- Use the max layout
+        class = {"Xterm"}
+
+    } ,
+    {
+        name        = "Den",
+        init        = true,
+        --exclusive   = true,
+        screen      = 1,
+        layout      = awful.layout.suit.tile,
+        fallback    = true,
+        --class ={
+        --    "Kate", "KDevelop", "Codeblocks", "Code::Blocks" , "DDD", "kate4"}
+        --} ,
+    },
+    {
+        name        = "Chat",
+        init        = true,
+        exclusive   = true,
+        screen      = 1,
+        layout      = awful.layout.suit.tile,
+        class ={ "TelegramDesktop", "WEECHAT"}
+    } ,
 --    {
---        name        = "Nush",                 -- Call the tag "Term"
---        init        = true,                   -- Load the tag on startup
---        screen      = 1,                  -- Create this tag on screen 1 and screen 2
---        layout      = awful.layout.suit.float, -- Use the tile layout
---       -- instance    = {"dev", "ops"},         -- Accept the following instances. This takes precedence over 'class'
---       -- class       = { --Accept the following classes, refuse everything else (because of "exclusive=true")
---       --     "xterm" , "urxvt" , "aterm","URxvt","XTerm","konsole","terminator","gnome-terminal"
---       -- }
---    } ,
---    {
---        name        = "Term",
+--        name        = "Files",
 --        init        = true,
 --        exclusive   = true,
---      --icon        = "~net.png",                 -- Use this icon for the tag (uncomment with a real path)
---        screen      = 1,
---        layout      = awful.layout.suit.tile,      -- Use the max layout
---        class = {"Xterm"}
---
---    } ,
---    {
---        name        = "Den",
---        init        = true,
---        --exclusive   = true,
 --        screen      = 1,
 --        layout      = awful.layout.suit.tile,
---        fallback    = true,
---        --class ={
---        --    "Kate", "KDevelop", "Codeblocks", "Code::Blocks" , "DDD", "kate4"}
---        --} ,
---    },
---    {
---        name        = "Chat",
---        init        = true,
---        exclusive   = true,
---        screen      = 1,
---        layout      = awful.layout.suit.tile,
---        class ={ "TelegramDesktop", "WEECHAT"}
+--        exec_once   = {"Thunar"}, --When the tag is accessed for the first time, execute this command
+--        class  = {
+--            "Thunar", "Konqueror", "Dolphin", "ark", "Nautilus","emelfm"
+--        }
 --    } ,
-----    {
-----        name        = "Files",
-----        init        = true,
-----        exclusive   = true,
-----        screen      = 1,
-----        layout      = awful.layout.suit.tile,
-----        exec_once   = {"Thunar"}, --When the tag is accessed for the first time, execute this command
-----        class  = {
-----            "Thunar", "Konqueror", "Dolphin", "ark", "Nautilus","emelfm"
-----        }
-----    } ,
---    {
---        name        = "Doc",
---        init        = false, -- This tag wont be created at startup, but will be when one of the
---                             -- client in the "class" section will start. It will be created on
---                             -- the client startup screen
---        exclusive   = true,
---        layout      = awful.layout.suit.max,
---        instance    = { "libreoffice" },
---        --class       = { "Assistant", "Okular", "Evince", "EPDFviewer", "xpdf", "Xpdf",}
---    } ,
---}
+    {
+        name        = "Doc",
+        init        = false, -- This tag wont be created at startup, but will be when one of the
+                             -- client in the "class" section will start. It will be created on
+                             -- the client startup screen
+        exclusive   = true,
+        layout      = awful.layout.suit.max,
+        instance    = { "libreoffice" },
+        --class       = { "Assistant", "Okular", "Evince", "EPDFviewer", "xpdf", "Xpdf",}
+    } ,
+}
 --tyrannical.settings.block_children_focus_stealing = true --Block popups ()
 --tyrannical.settings.group_children = true --Force popups/dialogs to have the same tags as the parent client
 
 -- {{{ Mouse bindings
-root.buttons(gears.table.join(
+root.buttons(awful.util.table.join(
     awful.button({ }, 3, function () mymainmenu:toggle() end),
     awful.button({ }, 4, awful.tag.viewnext),
     awful.button({ }, 5, awful.tag.viewprev)
@@ -1253,7 +1219,7 @@ root.buttons(gears.table.join(
 -- }}}
 
 -- {{{ Key bindings
-globalkeys = gears.table.join(
+globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
@@ -1334,7 +1300,20 @@ globalkeys = gears.table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
+    -- Prompt
+--    awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
+--              {description = "run prompt", group = "launcher"}),
     awful.key({ modkey },            "r",     function () awful.spawn("rofi -show drun") end), 
+    awful.key({ modkey }, "x",
+              function ()
+                  awful.prompt.run {
+                    prompt       = "Run Lua code: ",
+                    textbox      = awful.screen.focused().mypromptbox.widget,
+                    exe_callback = awful.util.eval,
+                    history_path = awful.util.get_cache_dir() .. "/history_eval"
+                  }
+              end,
+              {description = "lua execute prompt", group = "awesome"}),
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"}),
@@ -1391,7 +1370,7 @@ globalkeys = gears.table.join(
               {description = "Launch networkmanager-dmenu", group = "custom"})
 )
 
-clientkeys = gears.table.join(
+clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "f",
         function (c)
             c.fullscreen = not c.fullscreen
@@ -1427,7 +1406,7 @@ clientkeys = gears.table.join(
 -- Be careful: we use keycodes to make it work on any keyboard layout.
 -- This should map on the top row of your keyboard, usually 1 to 9.
 for i = 1, 9 do
-    globalkeys = gears.table.join(globalkeys,
+    globalkeys = awful.util.table.join(globalkeys,
         -- View tag only.
         awful.key({ modkey }, "#" .. i + 9,
                   function ()
@@ -1473,7 +1452,7 @@ for i = 1, 9 do
     )
 end
 
-clientbuttons = gears.table.join(
+clientbuttons = awful.util.table.join(
     awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
     awful.button({ modkey }, 1, awful.mouse.client.move),
     awful.button({ modkey }, 3, awful.mouse.client.resize))
@@ -1536,35 +1515,35 @@ awful.rules.rules = {
     },
 
      --Set Firefox to always map on the tag named "1" on screen 1.
-     { rule_any = { class = {"Firefox", "Luakit"}},
-       except = { type = "dialog"},
-       properties = { screen = 1, tag = "Den", maximized = true} },
+--     { rule_any = { class = {"Firefox", "Luakit"}},
+--       except = { type = "dialog"},
+--       properties = { screen = 1, tag = "Den", maximized = true} },
      { rule_any = { class = {"Pale moon"}},
        except = { type = "dialog"},
-       properties = { tag = "Nush", skip_taskbar = true} },
-     { rule = { name = "Keyboard" },
-       properties = { focusable = false, ontop = true } },
+       properties = { tag = "Nush", maximized = true, skip_taskbar = true, titlebars_enabled = true} },
+--     { rule = { name = "Keyboard" },
+--       properties = { focusable = false, ontop = true } },
      { rule = { class = "Thunar" },
        properties = { skip_taskbar = true } },
-     { rule = { class = "CURL" },
-       properties = { maximized = true } },
-     { rule = { class = "XTerm" },
-       properties = { tag = "Term"} },
-     --{ rule = { class = "Luakit" },
-     --  properties = { screen = 1, tag = "1" } },
-     { rule_any = { instance = { "libreoffice"} },
-       properties = { screen = 1, tag = "Docs" } },
-     { rule_any = { class = { "Geary", "TelegramDesktop", "WEECHAT" } },
-       properties = { screen = 1, tag = "Chat",  callback =  function()
-                        if not awesome.startup then    
-                            local screen = awful.screen.focused()
-                            local tag = screen.tags[4]
-                            if tag then
-                                tag:view_only()
-                            end
-                        end
-                    end
-       } },
+--     { rule = { class = "CURL" },
+--       properties = { maximized = true } },
+--     { rule = { class = "XTerm" },
+--       properties = { tag = "Term"} },
+--     --{ rule = { class = "Luakit" },
+--     --  properties = { screen = 1, tag = "1" } },
+--     { rule_any = { class = { "libreoffice-calc", "libreoffice-writer"} },
+--       properties = { screen = 1, tag = "Docs" } },
+--     { rule_any = { class = { "Geary", "TelegramDesktop", "WEECHAT" } },
+--       properties = { screen = 1, tag = "Chat",  callback =  function()
+--                        if not awesome.startup then    
+--                            local screen = awful.screen.focused()
+--                            local tag = screen.tags[4]
+--                            if tag then
+--                                tag:view_only()
+--                            end
+--                        end
+--                    end
+--       } },
 }
 -- }}}
 -- {{{ Signals
@@ -1580,19 +1559,19 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
-    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "Term"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "Term"):clients()[3].floating ~= true  then
-        awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "Term"))
-        master_increased = true
-    end
-   if awful.screen.focused().selected_tag.index == 1 then
-       awful.titlebar.show(c)
-   end
+--    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "2"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "2"):clients()[3].floating ~= true  then
+--        awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "2"))
+--        master_increased = true
+--    end
+--   if awful.screen.focused().selected_tag.index == 1 then
+--       awful.titlebar.show(c)
+--   end
 end)
 client.connect_signal("unmanage", function (c)
-    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "Term"):clients() == 2 and master_increased then
-        awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "Term"))
-        master_increased = false
-    end
+--    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "2"):clients() == 2 and master_increased then
+--        awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "2"))
+--        master_increased = false
+--    end
 end)
 
 
@@ -1600,7 +1579,7 @@ end)
 client.connect_signal("request::titlebars", function(c)
 
     -- buttons for the titlebar
-    local buttons = gears.table.join(
+    local buttons = awful.util.table.join(
             awful.button({ }, 1, function()
                 client.focus = c
                 c:raise()
@@ -1629,12 +1608,12 @@ client.connect_signal("request::titlebars", function(c)
 end)
 
 -- Enable sloppy focus, so that focus follows mouse.
-client.connect_signal("mouse::enter", function(c)
-    if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-        and awful.client.focus.filter(c) then
-        client.focus = c
-    end
-end)
+--client.connect_signal("mouse::enter", function(c)
+--    if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
+--        and awful.client.focus.filter(c) then
+--        client.focus = c
+--    end
+--end)
 
 client.connect_signal("focus", function(c) 
     c.border_color = theme.border_focus

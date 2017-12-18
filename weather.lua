@@ -52,6 +52,8 @@ end
 
 function getlocation()
     b, c, h = http.request("http://geoip.ubuntu.com/lookup")
+    print(b, c, h)
+    if b == nil then return end
     loc_page = collect(b)
     lat = loc_page[2][10][1]
     lon = loc_page[2][11][1]
@@ -60,6 +62,7 @@ end
 
 function getweather()
     lat, lon = getlocation()
+    if lat == nil then return end
     b, c, h = http.request("http://api.wunderground.com/auto/wui/geo/WXCurrentObXML/index.xml?query="..lat..","..lon)
     w_page = collect(b)
     weather=w_page[1][14][1]
