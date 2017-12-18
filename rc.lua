@@ -229,7 +229,7 @@ end
 --awful.util.spawn_with_shell("wmctrl -x -a conky || conky")
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
-run_once("nextcloud")
+--run_once("nextcloud")
 run_once("telegram-cli -dERDC -P 23911 &")
 --run_once("xxkb")
 run_once("redshift -o")
@@ -1592,8 +1592,9 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
-    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "Term"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "Term"):clients()[3].floating ~= true  then
-        awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "Term"))
+    --if awful.screen.focused().selected_tag.name == "Term" and #awful.tag.find_by_name(awful.screen.focused(), "Term"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "Term"):clients()[3].floating ~= true  then
+    if awful.screen.focused().selected_tag.name == "Term" and #awful.screen.focused().selected_tag:clients() == 3 and not awful.screen.focused().selected_tag:clients()[3].floating then
+        awful.tag.incnmaster(1, nil, true)
         master_increased = true
     end
     if awesome.hostname == "laptop" then
@@ -1603,8 +1604,8 @@ client.connect_signal("manage", function (c)
     end
 end)
 client.connect_signal("unmanage", function (c)
-    if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "Term"):clients() == 2 and master_increased then
-        awful.tag.incnmaster(-1, awful.tag.find_by_name(awful.screen.focused(), "Term"))
+    if awful.screen.focused().selected_tag.name == "Term" and #awful.screen.focused().selected_tag:clients() == 2 and master_increased then
+        awful.tag.incnmaster(-1, nil, true)
         master_increased = false
     end
 end)
