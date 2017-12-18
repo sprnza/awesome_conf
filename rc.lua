@@ -1589,9 +1589,11 @@ client.connect_signal("manage", function (c)
         awful.tag.incnmaster(1, awful.tag.find_by_name(awful.screen.focused(), "Term"))
         master_increased = true
     end
-   if awful.screen.focused().selected_tag.index == 1 then
-       awful.titlebar.show(c)
-   end
+    if awesome.hostname == "laptop" then
+        if awful.screen.focused().selected_tag.index == 1 then
+            awful.titlebar.show(c)
+        end
+    end
 end)
 client.connect_signal("unmanage", function (c)
     if awful.screen.focused().selected_tag.index == 2 and #awful.tag.find_by_name(awful.screen.focused(), "Term"):clients() == 2 and master_increased then
