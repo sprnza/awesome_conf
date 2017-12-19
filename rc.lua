@@ -240,6 +240,7 @@ if awesome.hostname == "arch" then
     run_once("numlockx on")
     run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
     run_once("xset s off")
+    run_once("xset -dpms")
     suspend = "enabled"
 elseif awesome.hostname == "laptop" then
     run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
@@ -925,7 +926,7 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(
     local hdd_bg = theme.bg_normal
     local upd_bg = theme.bg_normal
     local ram_bg = theme.bg_normal
-    srv_mon.root.bgd:set_bg(theme.bg_normal)
+    srv_mon.root.right:set_bg(theme.bg_normal)
     local lines = {}
     for line in stdout:gmatch("[^\r\n]+") do 
         lines[#lines + 1] = line
@@ -960,7 +961,7 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/local_status"', 300, function(w
     local hdd_bg = theme.bg_normal
     local upd_bg = theme.bg_normal
     local ram_bg = theme.bg_normal
-    rv_mon.root.right_loc:set_bg(theme.bg_normal)
+    srv_mon.root.right_loc:set_bg(theme.bg_normal)
     local lines = {}
     for line in stdout:gmatch("[^\r\n]+") do 
         lines[#lines + 1] = line
@@ -1015,8 +1016,8 @@ srv_mon:setup {
     layout = wibox.layout.flex.horizontal
 }
 srv_mon.top = 3
-srv_tip = awful.tooltip({ objects = { srv_mon.root.left }})
-loc_tip = awful.tooltip({ objects = { srv_mon.root.right}})
+srv_tip = awful.tooltip({ objects = { srv_mon.root }})
+--loc_tip = awful.tooltip({ objects = { srv_mon.root.right_loc}})
 -- }}}
 
 -- {{{ Wibar
@@ -1469,6 +1470,7 @@ awful.rules.rules = {
 
         name = {
           "Event Tester",  -- xev.
+          "Computers & Contacts", --teamviewer contact list
         },
         role = {
           "AlarmWindow",  -- Thunderbird's calendar.
