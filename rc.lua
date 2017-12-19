@@ -41,6 +41,12 @@ if awesome.startup_errors then
                      text = awesome.startup_errors })
 end
 
+awesome.connect_signal("exit",
+    function()
+        awful.spawn("pkill telegram-cli")
+end
+)
+
 -- Handle runtime errors after startup
 do
     local in_error = false
@@ -230,7 +236,7 @@ end
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 --run_once("nextcloud")
 run_once("telegram-cli -dERDC -P 23911 &")
---run_once("xxkb")
+run_once("light -S 30")
 run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
@@ -316,7 +322,7 @@ function b_notify()
         else
             icon = "notification-display-brightness-full"
         end
-        nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id 
+        return brt, icon
 end
 
 function translate()
@@ -926,32 +932,36 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(
     local hdd_bg = theme.bg_normal
     local upd_bg = theme.bg_normal
     local ram_bg = theme.bg_normal
-    srv_mon.root.right:set_bg(theme.bg_normal)
+    srv_mon.root.right:set_color(theme.bg_normal)
     local lines = {}
     for line in stdout:gmatch("[^\r\n]+") do 
         lines[#lines + 1] = line
     end
     if tonumber(lines[5]) > 10 then
         upd_bg = "#2943FF"
-        srv_mon.root.right:set_bg(upd_bg)
+        srv_mon.root.right:set_color(upd_bg)
+        srv_mon_buttons = gears.table.join(
+            awful.button({ }, 1, function () awful.spawn(terminal .. " -e ssh server -t pacaur -Syu --noedit --noconfirm && exit 0") end)
+            )
+        srv_mon.root.right:buttons(srv_mon_buttons)
     end
     if tonumber(string.match(lines[3], "%d+")) > 65 then
         temp_bg = "#800000"
-        srv_mon.root.right:set_bg(temp_bg)
+        srv_mon.root.right:set_color(temp_bg)
     end
     if tonumber(string.match(lines[7], "%d+")) > 999 then
         ram_bg = "#A52A2A"
-        srv_mon.root.right:set_bg(ram_bg)
+        srv_mon.root.right:set_color(ram_bg)
     end
     local root, home, backup = string.match(lines[4], "^(%d+)%% (%d+)%% (%d+)%%")
-    if tonumber(root) > 50 or tonumber(home) > 80 or tonumber(backup) > 60 then
+    if tonumber(root) > 80 or tonumber(home) > 80 or tonumber(backup) > 80 then
         hdd_bg = "#739300"
-        srv_mon.root.right:set_bg(hdd_bg)
+        srv_mon.root.right:set_color(hdd_bg)
     end
     local five_min_load = string.match(lines[2], "^%d+.%d+, (%d+).%d+")
     if tonumber(five_min_load) >= 1 then
         avg_bg = "#FF0000"
-        srv_mon.root.right:set_bg(avg_bg)
+        srv_mon.root.right:set_color(avg_bg)
     end
     srv_tip:set_markup("SERVER\n" .. lines[1].."<span background='" .. avg_bg .. "'>\nAverage load:\t\t" .. lines[2] .. "</span><span background='"..temp_bg .. "'>\nTemperature:\t\t" .. lines[3] .. "</span><span background='".. hdd_bg .. "'>\nRoot/Home/Backup usage:\t" .. lines[4] .. "</span><span background='" .. upd_bg .. "'>\nUpdates pending:\t".. lines[5] .. "</span>\nWashing:\t\t" .. lines[6]..":00".."<span background='" .. ram_bg.."'>\nRAM:\t\t\t"..lines[7].."</span>\nUpdated at:\t\t" ..lines[8])
 end)
@@ -961,28 +971,36 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/local_status"', 300, function(w
     local hdd_bg = theme.bg_normal
     local upd_bg = theme.bg_normal
     local ram_bg = theme.bg_normal
-    srv_mon.root.right_loc:set_bg(theme.bg_normal)
+    srv_mon.root.right_loc:set_color(theme.bg_normal)
     local lines = {}
     for line in stdout:gmatch("[^\r\n]+") do 
         lines[#lines + 1] = line
     end
     if tonumber(lines[3]) > 10 then
         upd_bg = "#2943FF"
-        srv_mon.root.right_loc:set_bg(upd_bg)
+        srv_mon.root.right_loc:set_color(upd_bg)
+        srv_mon_buttons = gears.table.join(
+            awful.button({ }, 1, function () awful.spawn(terminal .. " -e pacaur -Syu --noedit --noconfirm && exit 0") end)
+            )
+        srv_mon.root.right_loc:buttons(srv_mon_buttons)
     end
     if tonumber(string.match(lines[5], "%d+")) > 65 then
         temp_bg = "#800000"
-        srv_mon.root.right_loc:set_bg(temp_bg)
+        srv_mon.root.right_loc:set_color(temp_bg)
     end
     local root, home = string.match(lines[4], "^(%d+)%% (%d+)%%")
-    if tonumber(root) > 60 or tonumber(home) > 60 then
+    if tonumber(root) > 80 or tonumber(home) > 80 then
         hdd_bg = "#739300"
-        srv_mon.root.right_loc:set_bg(hdd_bg)
+        srv_mon.root.right_loc:set_color(hdd_bg)
+        srv_mon_buttons = gears.table.join(
+            awful.button({ }, 1, function () awful.spawn(terminal .. " -e ncdu /") end)
+            )
+        srv_mon.root.right_loc:buttons(srv_mon_buttons)
     end
     local five_min_load = string.match(lines[2], "^%d+.%d+, (%d+).%d+")
     if tonumber(five_min_load) >= 1 then
         avg_bg = "#FF0000"
-        srv_mon.root.right_loc:set_bg(avg_bg)
+        srv_mon.root.right_loc:set_color(avg_bg)
     end
     loc_tip:set_markup("This machine\n" .. lines[1].."<span background='"..avg_bg.."'>\nAverage load:\t\t" .. lines[2].. "</span><span background='"..temp_bg .. "'>\nTemperature:\t\t" .. lines[5] .. "</span><span background='".. hdd_bg .. "'>\nRoot/Home usage:\t" .. lines[4] .. "</span><span background='" .. upd_bg .. "'>\nUpdates pending:\t".. lines[3].."</span>")
 end)
@@ -1016,8 +1034,8 @@ srv_mon:setup {
     layout = wibox.layout.flex.horizontal
 }
 srv_mon.top = 3
-srv_tip = awful.tooltip({ objects = { srv_mon.root }})
---loc_tip = awful.tooltip({ objects = { srv_mon.root.right_loc}})
+srv_tip = awful.tooltip({ objects = { srv_mon.root.right }})
+loc_tip = awful.tooltip({ objects = { srv_mon.root.right_loc }})
 -- }}}
 
 -- {{{ Wibar
@@ -1300,8 +1318,22 @@ globalkeys = gears.table.join(
 
     end),
     -- Brightness buttons
-    awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
-    awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end),
+    awful.key({ }, "XF86MonBrightnessDown", function () 
+        brt, icon=b_notify()
+        if brt > 5 then
+            awful.spawn("light -U 5")
+            brt=brt-5
+        end
+        nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id 
+    end),
+    awful.key({ }, "XF86MonBrightnessUp", function ()
+        brt, icon=b_notify()
+        if brt < 100 then
+            brt=brt+5
+        end
+        awful.spawn("light -A 5")
+        nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id
+    end),
     -- Custom keybindings
    awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end),
    awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK2_RC_FILES=/home/speranza/.gtkrc-2.0-light palemoon -P Nusha")          end,
@@ -1528,7 +1560,6 @@ client.connect_signal("manage", function (c)
         -- Prevent clients from being unreachable after screen count changes.
         awful.placement.no_offscreen(c)
     end
-    --if awful.screen.focused().selected_tag.name == "Term" and #awful.tag.find_by_name(awful.screen.focused(), "Term"):clients() == 3 and awful.tag.find_by_name(awful.screen.focused(), "Term"):clients()[3].floating ~= true  then
     if awful.screen.focused().selected_tag.name == "Term" and #awful.screen.focused().selected_tag:clients() == 3 and not awful.screen.focused().selected_tag:clients()[3].floating then
         awful.tag.incnmaster(1, nil, true)
         master_increased = true
@@ -1614,17 +1645,11 @@ for s = 1, screen.count() do screen[s]:connect_signal("arrange", function ()
 
         if #clients > 0 then
             for _, c in pairs(clients) do
---				if (c.maximized == true) then
---					c.border_width = 0
-----                    if c.class == "Luakit" then
-----                        awful.titlebar.hide(c)
-----                    end
---                else
-----                    if c.class == "Luakit" then
-----                        awful.titlebar.show(c)
-----                    end
---					c.border_width = beautiful.border_width
---                end
+				if (c.maximized == true) then
+					c.border_width = 0
+                else
+					c.border_width = beautiful.border_width
+                end
             end
         end
       end)
