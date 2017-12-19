@@ -753,9 +753,8 @@ my_bat = wibox.container.margin()
 my_bat.top = 0
 my_bat_tip = awful.tooltip({ objects = {my_bat}})
 my_bat.visible = true
---local mpstat = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh mpstat"
---local xget = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh xset"
-local ff_tabs = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh firefox_tabs"
+--local ff_tabs = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh firefox_tabs"
+local pm_tabs = os.getenv("HOME") .. "/.config/awesome/bin/helpers.sh pm_tabs"
 DPMS = 0
 sleep = 0
 check_tabs = {"youtube.com", "192.168.1.10"}
@@ -767,15 +766,14 @@ btt = lain.widget.bat({
         timeout = 60,
         settings=function()
 		if awesome.hostname ~= "arch" then
-            --widget:set_text("⚕" .. bat_now.perc .. "%")
-            		widget:set_text("⛽" .. bat_now.perc .. "%")
-	    		if bat_now.perc == 100 then
-            			widget:set_text("⛽" .. " F")
-			end
-    		else
+        	widget:set_text("⛽" .. bat_now.perc .. "%")
+	   		if bat_now.perc == 100 then
+       			widget:set_text("⛽" .. " F")
+		    end
+    	else
 			bat_now.ac_status = 0
 			widget:set_text("⚕")
-	    	end	
+	   	end	
             widget:set_align("center")
             triggerTab = false
             if suspend ~= "manually" then
@@ -786,7 +784,7 @@ btt = lain.widget.bat({
                         xset = false
                     end
                 else
-                    awful.spawn.with_line_callback(ff_tabs, {
+                    awful.spawn.with_line_callback(pm_tabs, {
                         stdout = function(line)
                             tabs = line
                             loadstring(tabs)()
@@ -817,7 +815,7 @@ btt = lain.widget.bat({
                 if fullscreenClient and redshift then
                     awful.spawn("redshift -x >/dev/null 2>&1")
                     redshift = false
-                elseif not fullscreenClient then
+                elseif not fullscreenClient and not redshift then
                     awful.spawn("redshift -o >/dev/null 2>&1")
                     redshift = true
                 end
@@ -831,6 +829,7 @@ btt = lain.widget.bat({
                 if i > 0 or triggerTab or luakit_yt and suspend == "enabled" then
                     awful.spawn("xautolock -disable")
                     awful.spawn("xset -dpms")
+                    awful.spawn("xset s off")
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
