@@ -27,4 +27,13 @@ mon)
 vpn)
     ifconfig|grep -q "ppp0" && echo 1 || echo 0
     ;;
+pm_tabs)
+        if ps aux|grep -q "[p]alemoon --no-remote -P Sprnza" >/dev/null; then
+            palemoon_curr_my=$(sed -n "$(python2 <<< $'import json\nf = open("/home/speranza/.moonchild productions/pale moon/a1kp5jx3.default/sessionstore.js", "r")\njdata = json.loads(f.read())\nf.close()\nf.close()\nprint str(jdata["windows"][0]["selected"])')p" <(python2 <<< $'import json\nf = open("/home/speranza/.moonchild productions/pale moon/a1kp5jx3.default/sessionstore.js", "r")\njdata = json.loads(f.read())\nf.close()\nfor win in jdata.get("windows"):\n\tfor tab in win.get("tabs"):\n\t\ti = tab.get("index") - 1\n\t\tprint tab.get("entries")[i].get("url")')|sed "s/www.//g" |awk  -F/ '{print $3}'|awk '!x[$0]++')
+        fi
+        if ps aux|grep -q "[p]alemoon --no-remote -P Nusha"; then
+            palemoon_curr_nush=$(sed -n "$(python2 <<< $'import json\nf = open("/home/speranza/.moonchild productions/pale moon/4qs91zqv.Nusha/sessionstore.js", "r")\njdata = json.loads(f.read())\nf.close()\nf.close()\nprint str(jdata["windows"][0]["selected"])')p" <(python2 <<< $'import json\nf = open("/home/speranza/.moonchild productions/pale moon/4qs91zqv.Nusha/sessionstore.js", "r")\njdata = json.loads(f.read())\nf.close()\nfor win in jdata.get("windows"):\n\tfor tab in win.get("tabs"):\n\t\ti = tab.get("index") - 1\n\t\tprint tab.get("entries")[i].get("url")')|sed "s/www.//g" |awk  -F/ '{print $3}'|awk '!x[$0]++')
+        fi
+        echo "tabs = {\"$palemoon_curr_my\", \"$palemoon_curr_nush\"}"
+    ;;
 esac
