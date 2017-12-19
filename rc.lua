@@ -41,6 +41,12 @@ if awesome.startup_errors then
                      text = awesome.startup_errors })
 end
 
+awesome.connect_signal("exit",
+    function()
+        awful.spawn("pkill telegram-cli")
+end
+)
+
 -- Handle runtime errors after startup
 do
     local in_error = false
@@ -230,7 +236,7 @@ end
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 --run_once("nextcloud")
 run_once("telegram-cli -dERDC -P 23911 &")
---run_once("xxkb")
+run_once("light -S 30")
 run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
@@ -315,7 +321,7 @@ function b_notify()
         else
             icon = "notification-display-brightness-full"
         end
-        nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id 
+        return brt, icon
 end
 
 function translate()
@@ -1311,8 +1317,22 @@ globalkeys = gears.table.join(
 
     end),
     -- Brightness buttons
-    awful.key({ }, "XF86MonBrightnessDown", function () b_notify()    end),
-    awful.key({ }, "XF86MonBrightnessUp", function () b_notify() end),
+    awful.key({ }, "XF86MonBrightnessDown", function () 
+        brt, icon=b_notify()
+        if brt > 5 then
+            awful.spawn("light -U 5")
+            brt=brt-5
+        end
+        nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id 
+    end),
+    awful.key({ }, "XF86MonBrightnessUp", function ()
+        brt, icon=b_notify()
+        if brt < 100 then
+            brt=brt+5
+        end
+        awful.spawn("light -A 5")
+        nid = naughty.notify({text = "Brightness: " .. brt .. "%", replaces_id = nid, icon = icon}).id
+    end),
     -- Custom keybindings
    awful.key({ }, "Pause", function () awful.spawn("systemctl suspend") end),
    awful.key({ modkey, "Shift" }, "n",     function () awful.spawn("env GTK2_RC_FILES=/home/speranza/.gtkrc-2.0-light palemoon -P Nusha")          end,
