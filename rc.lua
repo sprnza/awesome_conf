@@ -246,6 +246,7 @@ if awesome.hostname == "arch" then
     run_once("numlockx on")
     run_once("xautolock -time 10 -locker 'systemctl suspend' -detectsleep &")
     run_once("xset s off")
+    run_once("xset -dpms")
     suspend = "enabled"
 elseif awesome.hostname == "laptop" then
     run_once(os.getenv("HOME") .. "/.bin/disable_touch.sh")
@@ -1500,6 +1501,7 @@ awful.rules.rules = {
 
         name = {
           "Event Tester",  -- xev.
+          "Computers & Contacts", --teamviewer contact list
         },
         role = {
           "AlarmWindow",  -- Thunderbird's calendar.
