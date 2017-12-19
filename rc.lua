@@ -850,7 +850,7 @@ btt = lain.widget.bat({
                         if not awesome.startup then
                             naughty.notify({text = "Power connected"})
                         end
-                        my_bat_ip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
+                        my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
                     elseif bat_now.ac_status == 0 and not xset then --transition from ac to battery
                         DPMS=180
                         awful.spawn("xset +dpms")
