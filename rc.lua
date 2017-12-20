@@ -259,8 +259,8 @@ elseif awesome.hostname == "laptop" then
     elseif awesome.hostname == "acer" then
 	    DPMS=180
 	    suspend = "enabled"
+    run_once("xset s " .. DPMS)
 end
-run_once("xset s " .. DPMS)
 
 --}}
 
@@ -837,7 +837,7 @@ btt = lain.widget.bat({
                 elseif i == 0 and not triggerTab and not luakit_yt and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
                     awful.spawn("xset +dpms")
-                    awful.spawn("xset s " .. DPMS)
+                    --awful.spawn("xset s " .. DPMS)
                     suspend = "enabled"
                     my_bat.root.bgd:set_bg(theme.bg_normal)
                     my_bat_tip:set_text("DPMS\t" .. string.format("%.0f", DPMS/60) .. " min\nSleep\t" .. sleep)
@@ -848,7 +848,7 @@ btt = lain.widget.bat({
                     if bat_now.ac_status == 1 and xset then -- transition from battery to ac
                         DPMS=300
                         awful.spawn("xset -dpms")
-                        awful.spawn("xset s " .. DPMS)
+                        --awful.spawn("xset s " .. DPMS)
                         awful.spawn("xautolock -disable")
                         sleep="disabled"
                         xset = false
@@ -859,7 +859,7 @@ btt = lain.widget.bat({
                     elseif bat_now.ac_status == 0 and not xset then --transition from ac to battery
                         DPMS=180
                         awful.spawn("xset +dpms")
-                        awful.spawn("xset s " .. DPMS)
+                        --awful.spawn("xset s " .. DPMS)
                         awful.spawn("xautolock -enable")
                         sleep="5 min"
                         xset = true
@@ -898,7 +898,7 @@ my_bat:buttons(gears.table.join(
         my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
     else
         awful.spawn("xset +dpms")
-        awful.spawn("xset s " .. DPMS)
+        --awful.spawn("xset s " .. DPMS)
         awful.spawn("xautolock -enable")
         suspend = "enabled"
         my_bat.root.bgd:set_bg(theme.bg_normal)
