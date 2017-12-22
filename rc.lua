@@ -551,7 +551,7 @@ weather_widget:setup {
     {
         {
             id = "text",
-            text = i..t.."°",
+            text = "w: "..t.."°",
             align = "center",
             widget = wibox.widget.textbox
         },
@@ -767,9 +767,9 @@ btt = lain.widget.bat({
         timeout = 60,
         settings=function()
 		if awesome.hostname ~= "arch" then
-        	widget:set_text("⛽" .. bat_now.perc .. "%")
+        	widget:set_text("b: " .. bat_now.perc .. "%")
 	   		if bat_now.perc == 100 then
-       			widget:set_text("⛽" .. " F")
+       			widget:set_text("b: " .. " F")
 		    end
     	else
 			bat_now.ac_status = 0

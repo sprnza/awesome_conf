@@ -75,15 +75,15 @@ function getweather()
     updated=string.format("%02.0f", upd.day).."."..string.format("%02.0f", upd.month).."."..upd.year.." "..string.format("%02.0f", upd.hour)..":"..string.format("%02.0f", upd.min)
 
     if string.match(string.lower(weather), "rain") then
-        icon = "⛆"
+        icon = "r"
     elseif string.match(string.lower(weather), "storm") then
-        icon = "⛈"
+        icon = "s"
     elseif string.match(string.lower(weather), "cloud") then
-        icon = "⛅"
+        icon = "c"
     elseif string.match(string.lower(weather), "clear") then
-        icon = "☼"
+        icon = "clr"
     elseif string.match(string.lower(weather), "snow") then
-        icon = "⛄"
+        icon = "snw"
     else
 	icon = ""
     end
