@@ -472,7 +472,7 @@ thunarLauncher:setup {
     color=theme.bg_normal,
     widget=wibox.container.margin
 }
-if awesome.hostname == "arch" then
+if awesome.hostname ~= "laptop" then
     paleLauncher.visible = false
     thunarLauncher.visible = false
 end
@@ -1135,7 +1135,7 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
-    if awesome.hostname ~= "arch" then
+    if awesome.hostname == "laptop" then
         awful.tag.add("Nush", {
             layout = awful.layout.layouts[1],
             screen = s,
@@ -1497,6 +1497,7 @@ awful.rules.rules = {
           "Keepassx2",
           "Tk",
           "Dialog",
+          "feh",
           "SpeedCrunch"},
 
         name = {
