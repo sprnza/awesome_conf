@@ -1141,6 +1141,12 @@ awful.screen.connect_for_each_screen(function(s)
             screen = s,
             selected = true
         })
+    else
+        awful.tag.add("Misc", {
+            layout = awful.layout.layouts[2],
+            screen = s,
+            selected = true
+        })
     end
     awful.tag.add("Term", {
         layout = awful.layout.layouts[2],
