@@ -1352,8 +1352,10 @@ globalkeys = gears.table.join(
               {description = "attach to Weechat", group = "custom"}),
    awful.key({ modkey, "Control" }, "x",     function () awful.spawn(terminal .. " -hold -e \"xprop\"")          end,
               {description = "Get window.Class property", group = "custom"}),
-   awful.key({ modkey, "Shift" }, "t",     translate,
+   awful.key({ modkey, "Control" }, "t",     translate,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
+   awful.key({ modkey, "Control" }, "f",     function () awful.spawn(terminal .. " -e ranger") end,
+              {description = "Open file manager", group = "custom"}),
    awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
    awful.key({ modkey, "Control" }, "k",     function () awful.spawn("rofi-pass") end,
@@ -1364,8 +1366,6 @@ globalkeys = gears.table.join(
               {description = "Take a screenshot ot the selected region", group = "custom"}),
    awful.key({"Mod1" }, "Print",     function () awful.spawn("xfce4-screenshooter -w") end,
               {description = "Take a screenshot ot the active window", group = "custom"}),
-   awful.key({"Mod1" }, "m",     function () awful.spawn(os.getenv("HOME").."/.hud/hud-menu.py") end,
-              {description = "Show a HUD menu", group = "custom"}),
    awful.key({"Mod1", "Control" }, "n",     function () awful.spawn("networkmanager_dmenu") end,
               {description = "Launch networkmanager-dmenu", group = "custom"})
 )
