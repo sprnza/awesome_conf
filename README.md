@@ -5,6 +5,7 @@
 * sysstat
 * xfce4-screenshooter
 * redshift
+* xcmenu
 
 ## Libraries
 lain
