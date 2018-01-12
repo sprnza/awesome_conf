@@ -15,7 +15,7 @@ local common = require("awful.widget.common")
 local lain = require("lain")
 
 -- Custom libraries
-local weather = require("weather")
+--local weather = require("weather")
 
 local dpi = require("beautiful").xresources.apply_dpi
 
@@ -235,7 +235,7 @@ end
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 --run_once("nextcloud")
-run_once("telegram-cli -dERDC -P 23911 &")
+--run_once("telegram-cli -dERDC -P 23911 &")
 run_once("light -S 30")
 run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
@@ -538,43 +538,43 @@ mailwidgettimer:start()
 
 -- Weather widget
 
-weather_widget = wibox.container.margin()
-i, w, t, h, wd, ws, c, u = getweather()
-if i == nil then i, w, t, h, wd, ws, c, u = "", "na", "N/A", "na", "na", "na", "na", "na" end
-weather_buttons = gears.table.join(
-    awful.button({ }, 1, function () 
-        i, w, t, h, wd, ws, c, u = getweather()
-        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
-    end)
-    )
-weather_widget:setup {
-    {
-        {
-            id = "text",
-            text = "w: "..t.."°",
-            align = "center",
-            widget = wibox.widget.textbox
-        },
-        id = "bgd",
-        buttons = weather_buttons,
-        widget = wibox.container.background
-    },
-    id = "root",
-    layout = wibox.layout.fixed.vertical
-}
-weather_widget.top = 0
-weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
-weatherwidgettimer = gears.timer({ timeout = 3600 })
-weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
-weatherwidgettimer:connect_signal("timeout",
-    function()
-        --mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
-
-        i, w, t, h, wd, ws, c, u = getweather()
-    end
-)
-weatherwidgettimer:start()
-
+--weather_widget = wibox.container.margin()
+--i, w, t, h, wd, ws, c, u = getweather()
+--if i == nil then i, w, t, h, wd, ws, c, u = "", "na", "N/A", "na", "na", "na", "na", "na" end
+--weather_buttons = gears.table.join(
+--    awful.button({ }, 1, function () 
+--        i, w, t, h, wd, ws, c, u = getweather()
+--        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
+--    end)
+--    )
+--weather_widget:setup {
+--    {
+--        {
+--            id = "text",
+--            text = "w: "..t.."°",
+--            align = "center",
+--            widget = wibox.widget.textbox
+--        },
+--        id = "bgd",
+--        buttons = weather_buttons,
+--        widget = wibox.container.background
+--    },
+--    id = "root",
+--    layout = wibox.layout.fixed.vertical
+--}
+--weather_widget.top = 0
+--weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
+--weatherwidgettimer = gears.timer({ timeout = 3600 })
+--weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
+--weatherwidgettimer:connect_signal("timeout",
+--    function()
+--        --mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+--
+--        i, w, t, h, wd, ws, c, u = getweather()
+--    end
+--)
+--weatherwidgettimer:start()
+--
 --- VPN widget
 vpn_widget = wibox.container.margin()
 vpn_buttons = gears.table.join(
@@ -1190,7 +1190,7 @@ awful.screen.connect_for_each_screen(function(s)
     -- Add widgets to the wibox
     local top_layout = wibox.layout.fixed.vertical(s.mytaglist, paleLauncher, thunarLauncher)
     local mid_layout =  wibox.layout.fixed.vertical(s.mytasklist)
-    local bot_layout = wibox.layout.fixed.vertical(systray, srv_mon, bg_widget, vpn_widget, my_mem, mailwidget, my_bat, weather_widget, my_volume, kbdwidget, txtclock)
+    local bot_layout = wibox.layout.fixed.vertical(systray, srv_mon, bg_widget, vpn_widget, my_mem, mailwidget, my_bat, my_volume, kbdwidget, txtclock)
     
     local layout = wibox.layout.align.vertical()
     layout:set_top(top_layout)
@@ -1292,7 +1292,7 @@ globalkeys = gears.table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
-    awful.key({ modkey },            "r",     function () awful.spawn("rofi -show drun") end), 
+    awful.key({ modkey },            "r",     function () awful.spawn("rofi -show drun -display-drun 'Programs'") end), 
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"}),
