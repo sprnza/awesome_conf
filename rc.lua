@@ -1539,7 +1539,7 @@ awful.rules.rules = {
        properties = { tag = "Term"} },
      --{ rule = { class = "Luakit" },
      --  properties = { screen = 1, tag = "1" } },
-     { rule_any = { instance = { "libreoffice"} },
+     { rule_any = { instance = {"libreoffice", "soffice" } },
        properties = { screen = 1, tag = "Docs" } },
      { rule_any = { class = { "Geary", "TelegramDesktop", "WEECHAT" } },
        properties = { screen = 1, tag = "Chat",  callback =  function()
