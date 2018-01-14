@@ -538,43 +538,43 @@ mailwidgettimer:start()
 
 -- Weather widget
 
-weather_widget = wibox.container.margin()
-i, w, t, h, wd, ws, c, u = getweather()
-if i == nil then i, w, t, h, wd, ws, c, u = "", "na", "N/A", "na", "na", "na", "na", "na" end
-weather_buttons = gears.table.join(
-    awful.button({ }, 1, function () 
-        i, w, t, h, wd, ws, c, u = getweather()
-        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
-    end)
-    )
-weather_widget:setup {
-    {
-        {
-            id = "text",
-            text = "w: "..t.."°",
-            align = "center",
-            widget = wibox.widget.textbox
-        },
-        id = "bgd",
-        buttons = weather_buttons,
-        widget = wibox.container.background
-    },
-    id = "root",
-    layout = wibox.layout.fixed.vertical
-}
-weather_widget.top = 0
-weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
-weatherwidgettimer = gears.timer({ timeout = 3600 })
-weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
-weatherwidgettimer:connect_signal("timeout",
-    function()
-        --mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
-
-        i, w, t, h, wd, ws, c, u = getweather()
-    end
-)
-weatherwidgettimer:start()
-
+--weather_widget = wibox.container.margin()
+--i, w, t, h, wd, ws, c, u = getweather()
+--if i == nil then i, w, t, h, wd, ws, c, u = "", "na", "N/A", "na", "na", "na", "na", "na" end
+--weather_buttons = gears.table.join(
+--    awful.button({ }, 1, function () 
+--        i, w, t, h, wd, ws, c, u = getweather()
+--        awful.spawn(terminal .. " -hold -class CURL -e curl http://wttr.in/"..c)
+--    end)
+--    )
+--weather_widget:setup {
+--    {
+--        {
+--            id = "text",
+--            text = "w: "..t.."°",
+--            align = "center",
+--            widget = wibox.widget.textbox
+--        },
+--        id = "bgd",
+--        buttons = weather_buttons,
+--        widget = wibox.container.background
+--    },
+--    id = "root",
+--    layout = wibox.layout.fixed.vertical
+--}
+--weather_widget.top = 0
+--weather_widget_tip = awful.tooltip({ objects = { weather_widget }})
+--weatherwidgettimer = gears.timer({ timeout = 3600 })
+--weather_widget_tip:set_text("WEATHER @ "..c.."\nCondition:\t" .. w .. "\nHuminidity:\t" .. h .. "\nWind\t\t" .. wd .. " / " .. ws.." m/s\nUpdated:\t"..u)
+--weatherwidgettimer:connect_signal("timeout",
+--    function()
+--        --mailwidget_tip:set_text("MAIL\nPrivate\t" .. pr_mail .. "\n" .. "Work\t" .. wrk_mail .. "\nTELEGRAM\nDenis\t" .. telegram)
+--
+--        i, w, t, h, wd, ws, c, u = getweather()
+--    end
+--)
+--weatherwidgettimer:start()
+--
 --- VPN widget
 vpn_widget = wibox.container.margin()
 vpn_buttons = gears.table.join(
@@ -827,14 +827,14 @@ btt = lain.widget.bat({
                         end
                     end
                 end
-                if i > 0 or triggerTab or luakit_yt and suspend == "enabled" then
-                    awful.spawn("xautolock -disable")
+                if i > 0 or triggerTab or luakit_yt or fullscreenClient and suspend == "enabled" then
                     awful.spawn("xset -dpms")
                     awful.spawn("xset s off")
+                    awful.spawn("xautolock -disable")
                     suspend = "disabled"
                     my_bat.root.bgd:set_bg("#7A4000")
                     my_bat_tip:set_text("DPMS\t" .. suspend .. "\nSleep\t" .. suspend)
-                elseif i == 0 and not triggerTab and not luakit_yt and suspend == "disabled" then
+                elseif i == 0 and not triggerTab and not luakit_yt and not fullscreenClient and suspend == "disabled" then
                     awful.spawn("xautolock -enable")
                     awful.spawn("xset +dpms")
                     --awful.spawn("xset s " .. DPMS)
@@ -940,7 +940,7 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/server_status"', 300, function(
         upd_bg = "#2943FF"
         srv_mon.root.right:set_color(upd_bg)
         srv_mon_buttons = gears.table.join(
-            awful.button({ }, 1, function () awful.spawn(terminal .. " -e ssh server -t pacaur -Syu --noedit --noconfirm && exit 0") end)
+            awful.button({ }, 1, function () awful.spawn(terminal .. " -e ssh server -t pacaur -Syu --noedit --noconfirm; exit 0") end)
             )
         srv_mon.root.right:buttons(srv_mon_buttons)
     end
@@ -979,7 +979,7 @@ awful.widget.watch('bash -c "cat $HOME/.bin/temp/local_status"', 300, function(w
         upd_bg = "#2943FF"
         srv_mon.root.right_loc:set_color(upd_bg)
         srv_mon_buttons = gears.table.join(
-            awful.button({ }, 1, function () awful.spawn(terminal .. " -e pacaur -Syu --noedit --noconfirm && exit 0") end)
+            awful.button({ }, 1, function () awful.spawn(terminal .. " -e pacaur -Syu --noedit --noconfirm;  exit 0") end)
             )
         srv_mon.root.right_loc:buttons(srv_mon_buttons)
     end
@@ -1190,7 +1190,7 @@ awful.screen.connect_for_each_screen(function(s)
     -- Add widgets to the wibox
     local top_layout = wibox.layout.fixed.vertical(s.mytaglist, paleLauncher, thunarLauncher)
     local mid_layout =  wibox.layout.fixed.vertical(s.mytasklist)
-    local bot_layout = wibox.layout.fixed.vertical(systray, srv_mon, bg_widget, vpn_widget, my_mem, mailwidget, my_bat, weather_widget, my_volume, kbdwidget, txtclock)
+    local bot_layout = wibox.layout.fixed.vertical(systray, srv_mon, bg_widget, vpn_widget, my_mem, mailwidget, my_bat, my_volume, kbdwidget, txtclock)
     
     local layout = wibox.layout.align.vertical()
     layout:set_top(top_layout)
