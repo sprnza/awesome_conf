@@ -22,6 +22,7 @@ theme.text_dark                     = xrdb.foreground
 theme.text_light                    = xrdb.foreground
 
 theme.fg_focus                      = theme.highlight_dark
+theme.fg_normal                     = theme.text_light
 theme.bg_normal                     = theme.color_dark
 theme.fg_urgent                     = theme.text_dark
 theme.bg_urgent                     = xrdb.color1
@@ -30,7 +31,7 @@ theme.border_normal                 = "#000000"         -- black borders on wind
 theme.border_focus                  = theme.highlight_light
 theme.taglist_bg_normal             = theme.color_dark
 theme.taglist_bg_focus              = theme.color_dark
-theme.taglist_fg_normal             = theme.text_light
+theme.taglist_fg_normal             = theme.text_dark
 theme.taglist_fg_focus              = theme.highlight_dark
 local taglist_square_size = dpi(4)
 theme.taglist_squares_sel = theme_assets.taglist_squares_sel(

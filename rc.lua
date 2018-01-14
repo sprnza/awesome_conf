@@ -15,7 +15,7 @@ local common = require("awful.widget.common")
 local lain = require("lain")
 
 -- Custom libraries
-local weather = require("weather")
+--local weather = require("weather")
 
 local dpi = require("beautiful").xresources.apply_dpi
 
@@ -235,8 +235,9 @@ end
 
 run_once("setxkbmap -layout 'us,ru' -option grp:caps_toggle -option grp_led:caps")
 --run_once("nextcloud")
-run_once("telegram-cli -dERDC -P 23911 &")
+--run_once("telegram-cli -dERDC -P 23911 &")
 run_once("light -S 30")
+run_once("xcmenu --primary --clipboard --daemon")
 run_once("redshift -o")
 run_once("xrdb -merge " .. os.getenv("HOME") .. "/.Xresources")
 --run_once("xfce4-power-manager")
@@ -472,7 +473,7 @@ thunarLauncher:setup {
     color=theme.bg_normal,
     widget=wibox.container.margin
 }
-if awesome.hostname == "arch" then
+if awesome.hostname ~= "laptop" then
     paleLauncher.visible = false
     thunarLauncher.visible = false
 end
@@ -1135,9 +1136,15 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
-    if awesome.hostname ~= "arch" then
+    if awesome.hostname == "laptop" then
         awful.tag.add("Nush", {
             layout = awful.layout.layouts[1],
+            screen = s,
+            selected = true
+        })
+    else
+        awful.tag.add("Misc", {
+            layout = awful.layout.layouts[2],
             screen = s,
             selected = true
         })
@@ -1292,7 +1299,7 @@ globalkeys = gears.table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
-    awful.key({ modkey },            "r",     function () awful.spawn("rofi -show drun") end), 
+    awful.key({ modkey },            "r",     function () awful.spawn("rofi -show drun -display-drun 'Programs'") end), 
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"}),
@@ -1345,8 +1352,10 @@ globalkeys = gears.table.join(
               {description = "attach to Weechat", group = "custom"}),
    awful.key({ modkey, "Control" }, "x",     function () awful.spawn(terminal .. " -hold -e \"xprop\"")          end,
               {description = "Get window.Class property", group = "custom"}),
-   awful.key({ modkey, "Shift" }, "t",     translate,
+   awful.key({ modkey, "Control" }, "t",     translate,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
+   awful.key({ modkey, "Control" }, "f",     function () awful.spawn(terminal .. " -e ranger") end,
+              {description = "Open file manager", group = "custom"}),
    awful.key({ modkey,  }, "o",     function() awful.spawn(os.getenv("HOME").."/.bin/rofi_files.sh launch") end,
               {description = "Translate selected text using Yandex.Translate", group = "custom"}),
    awful.key({ modkey, "Control" }, "k",     function () awful.spawn("rofi-pass") end,
@@ -1357,8 +1366,6 @@ globalkeys = gears.table.join(
               {description = "Take a screenshot ot the selected region", group = "custom"}),
    awful.key({"Mod1" }, "Print",     function () awful.spawn("xfce4-screenshooter -w") end,
               {description = "Take a screenshot ot the active window", group = "custom"}),
-   awful.key({"Mod1" }, "m",     function () awful.spawn(os.getenv("HOME").."/.hud/hud-menu.py") end,
-              {description = "Show a HUD menu", group = "custom"}),
    awful.key({"Mod1", "Control" }, "n",     function () awful.spawn("networkmanager_dmenu") end,
               {description = "Launch networkmanager-dmenu", group = "custom"})
 )
@@ -1497,6 +1504,7 @@ awful.rules.rules = {
           "Keepassx2",
           "Tk",
           "Dialog",
+          "feh",
           "SpeedCrunch"},
 
         name = {
@@ -1531,7 +1539,7 @@ awful.rules.rules = {
        properties = { tag = "Term"} },
      --{ rule = { class = "Luakit" },
      --  properties = { screen = 1, tag = "1" } },
-     { rule_any = { instance = { "libreoffice"} },
+     { rule_any = { instance = {"libreoffice", "soffice" } },
        properties = { screen = 1, tag = "Docs" } },
      { rule_any = { class = { "Geary", "TelegramDesktop", "WEECHAT" } },
        properties = { screen = 1, tag = "Chat",  callback =  function()
